@@ -3,6 +3,7 @@ import './App.css'
 import HomePage from './HomePage'
 import Inbox from './Inbox'
 import FYPGroupPage from './fypgroup'
+import LoginPage from './LoginPage'
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
     <HomePage></HomePage>
     // <Inbox></Inbox>
     // <FYPGroupPage></FYPGroupPage>
+    // <LoginPage></LoginPage>
   )
 }
 
