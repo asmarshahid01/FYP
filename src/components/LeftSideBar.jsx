@@ -1,5 +1,6 @@
 import { React, useState, useRef } from 'react';
 import profileImage from '../assets/profile.jpg';
+import { useNavigate } from 'react-router-dom';
 import {
 	Home,
 	Mail,
@@ -17,6 +18,8 @@ const LeftSideBar = () => {
 	const fgClr = 'bg-[#292b3a]';
 	const borderClr = 'border-[#282e3b]';
 	const borderBgClr = 'border-[#111820]';
+
+	const navigate = useNavigate();
 
 	const [bio, setBio] = useState('');
 	const [userInfoChanged, setUserInfoChanged] = useState(false);
@@ -78,7 +81,10 @@ const LeftSideBar = () => {
 						} ${selectedMenu == 1 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
       cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
       duration-300 font-bold flex gap-[0.5vw]`}
-						onClick={() => setSelectedMenu(1)}
+						onClick={() => {
+							setSelectedMenu(1);
+							navigate('/home');
+						}}
 					>
 						<Home /> Dashboard
 					</div>
@@ -88,7 +94,10 @@ const LeftSideBar = () => {
 						} ${selectedMenu == 2 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
       cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
       duration-300 font-bold flex gap-[0.5vw]`}
-						onClick={() => setSelectedMenu(2)}
+						onClick={() => {
+							setSelectedMenu(2);
+							navigate('/inbox');
+						}}
 					>
 						<Mail /> Inbox
 					</div>
@@ -98,7 +107,10 @@ const LeftSideBar = () => {
 						} ${selectedMenu == 3 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
       cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
       duration-300 font-bold flex gap-[0.5vw]`}
-						onClick={() => setSelectedMenu(3)}
+						onClick={() => {
+							setSelectedMenu(3);
+							navigate('/group');
+						}}
 					>
 						<Users /> FYP Group
 					</div>
