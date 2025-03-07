@@ -1,19 +1,47 @@
-import { useState } from 'react'
-import './App.css'
-import HomePage from './HomePage'
-import Inbox from './Inbox'
-import FYPGroupPage from './fypgroup'
-import LoginPage from './LoginPage'
+import { useState } from 'react';
+import './App.css';
+import ProtectedRoute from './components/ProtectedRoute';
+import {
+	BrowserRouter as Router,
+	Route,
+	Routes,
+	Navigate,
+} from 'react-router-dom';
+import HomePage from './components/HomePage';
+import Inbox from './components/Inbox';
+import FYPGroupPage from './components/fypgroup';
+import LoginPage from './components/LoginPage';
+
+// function App() {
+// 	return (
+// 		<HomePage></HomePage>
+// 		// <Inbox></Inbox>
+// 		//<FYPGroupPage></FYPGroupPage>
+// 		//<LoginPage></LoginPage>
+// 	);
+// }
 
 function App() {
-
-  return (
-    // <h1 className="text-3xl font-bold underline">      Hello world!    </h1>
-    <HomePage></HomePage>
-    // <Inbox></Inbox>
-    // <FYPGroupPage></FYPGroupPage>
-    // <LoginPage></LoginPage>
-  )
+	return (
+		<Router>
+			<Routes>
+				<Route path='/' element={<ProtectedRoute element={<HomePage />} />} />
+				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
+				<Route
+					path='/group'
+					element={<ProtectedRoute element={<FYPGroupPage />} />}
+				/>
+				<Route
+					path='/home'
+					element={<ProtectedRoute element={<HomePage />} />}
+				/>
+				<Route
+					path='/login'
+					element={<ProtectedRoute element={<LoginPage />} />}
+				/>
+			</Routes>
+		</Router>
+	);
 }
 
-export default App
+export default App;
