@@ -7,8 +7,6 @@ import {
 	Users,
 	FileText,
 	LogOut,
-	ChevronDown,
-	ChevronUp,
 	ChevronRight,
 	ChevronLeft,
 } from 'lucide-react';
@@ -41,13 +39,12 @@ const LeftSideBar = () => {
 	return (
 		<>
 			<div
-				className={`w-1/7 h-full ${bgClr} shadow-md flex flex-col items-center gap-[5vh] border-r-[0.1vw] ${borderClr} relative`}
-			>
+				className={`w-1/7 h-full ${bgClr} shadow-md flex flex-col items-center gap-[5vh] border-r-[0.1vw] ${borderClr} relative`}>
 				{/* Profile Section (Absolute Positioning) */}
 				<div className='w-full p-[0.5vw] absolute top-0 left-0'>
 					<div
 						className={`flex flex-col items-start w-full border border-[#555555] "bg-[#2a363b]" shadow-lg rounded-sm
-        p-[0.5vw] cursor-pointer hover:border-[#f7c402] duration-500 transition-all ease-in-out overflow-hidden "h-[7vh]"`}
+        					p-[0.5vw] cursor-pointer hover:border-[#f7c402] duration-500 transition-all ease-in-out overflow-hidden "h-[7vh]"`}
 						onClick={() => setUserProfileExpand(!userProfileExpand)}
 					>
 						<div className='flex justify-between w-full'>
@@ -134,10 +131,10 @@ const LeftSideBar = () => {
 				</div>
 			</div>
 
-			<div className='h-full w-1/6 bg-[#f2f3f8] relative'>
+			<div className='h-full w-1/6 bg-transparent pointer-events-none z-10 relative'>
 				<div
 					className={`absolute top-0 left-0 h-full bg-[#292b3a] transition-all duration-500 ${
-						userProfileExpand ? 'w-full' : 'w-0'
+						userProfileExpand ? 'w-full pointer-events-auto' : 'w-0'
 					}
     flex items-center justify-center`}
 				>

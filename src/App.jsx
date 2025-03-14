@@ -11,6 +11,8 @@ import HomePage from './components/HomePage';
 import Inbox from './components/Inbox';
 import FYPGroupPage from './components/fypgroup';
 import LoginPage from './components/LoginPage';
+import StudentPage from './components/StudentPage';
+import TeacherPage from './components/TeacherPage';
 
 // function App() {
 // 	return (
@@ -25,7 +27,7 @@ function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path='/' element={<ProtectedRoute element={<HomePage />} />} />
+				<Route path='/' element={<ProtectedRoute element={<StudentPage />} />} />
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
 					path='/group'
