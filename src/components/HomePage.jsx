@@ -4,6 +4,7 @@ import '../tailwind.css';
 import LeftSideBar from './LeftSideBar';
 import profileImage from '../assets/profile.jpg';
 import postImage from '../assets/post.jpg';
+import ProfileBar from './ProfileBar';
 
 const HomePage = () => {
 	const bgClr = 'bg-[#f2f3f8]';
@@ -14,7 +15,24 @@ const HomePage = () => {
 	const [selectedOption, setSelectedOption] = useState('All');
 	const [isOpen, setIsOpen] = useState(false);
 	const [rightSideBarExpand, setRightSideBarExpand] = useState(false);
+	const [requestMsg, setRequestMsg] = useState("");
 	const dropdownRef = useRef(null);
+
+	const [selectedRole, setSelectedRole] = useState("students");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [pending, setPending] = useState([]);
+	const [accounts] = useState([
+		"John Doe", "Jane Smith", "Alice Johnson", "Bob Brown", "Charlie White"
+	  ]);
+	  
+	  // Filter accounts based on search query and selected role
+	  const filteredAccounts = accounts.filter(account => {
+		return (
+		  account.toLowerCase().includes(searchQuery.toLowerCase()) && 
+		  (selectedRole === "students" || selectedRole === "teachers") &&
+		  searchQuery.length > 0
+		);
+	  });
 
 	const Card = ({ children, className, onClick }) => (
 		<div
@@ -105,12 +123,12 @@ const HomePage = () => {
 
 							{isOpen && (
 								<div
-									className={`absolute w-full mt-[0.5vw] ${fgClr} rounded-sm shadow-lg`}
+									className={`absolute w-full mt-[0.5vw] bg-[#3f51b5] rounded-sm shadow-lg`}
 								>
 									{['All', 'Teachers', 'Students'].map((option) => (
 										<div
 											key={option}
-											className='px-[1vw] py-[0.5vw] text-[#333] hover:bg-gray-100 cursor-pointer'
+											className='px-[1vw] py-[0.5vw] text-white hover:bg-[#4e5fbb] cursor-pointer'
 											onClick={() => {
 												setSelectedOption(option);
 												setIsOpen(false);
@@ -148,14 +166,12 @@ const HomePage = () => {
 								</div>
 							</div>
 							<p className='mt-[0.5vw]'>{post.content}</p>
-							<div className='w-full mt-[0.8vw]'>
-								<img
-									src={post.images[0]}
-									key={index}
-									className='h-auto w-full rounded-md flex items-center justify-center font-bold'
-									alt='post'
-								/>
-							</div>
+							<div className='flex gap-[0.5vw] w-full mt-[2vh]'>
+                                <input type='text' value={requestMsg} onChange={(e)=>setRequestMsg(e.target.value)} placeholder='Request Message'
+                                className='text-[#888888] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none flex-[8]' />
+                                <div className='h-[2.5vw] w-full bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
+                                rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2]'>Request</div>
+                            </div>
 							{/* <div className="mt-[0.5vw] flex">
                   <input 
                   type="text" 
@@ -186,38 +202,47 @@ const HomePage = () => {
 				</div>
 			</div>
 
-			{/* Right Sidebar */}
-			<div className='h-full w-1/5 bg-[#f2f3f8] relative'>
-				<div
-					className={`absolute top-0 right-0 h-full bg-[#355c7d] transition-all duration-500 ${
-						rightSideBarExpand ? 'w-full' : 'w-0'
-					}
-        flex items-center justify-center`}
-				>
-					<div
-						className={`h-full transition-all duration-500 ${
-							rightSideBarExpand ? 'min-w-full max-w-full' : 'min-w-0 max-w-0'
-						} 
-        ${
-					rightSideBarExpand ? 'opacity-100' : 'opacity-0'
-				} relative overflow-hidden flex-shrink-0 flex flex-col items-center justify-center`}
-					>
-						<div className='relative w-[8vw] h-[8vw]'>
-							<img
-								src={profileImage}
-								className='w-full h-full rounded-full cursor-pointer'
-							/>
+			{/* Right Panel */}
+			<div className={`w-1/5 p-[1vw] ${bgClr} border-l-[0.1vw] border-[#D3D7EE] text-white`}>
+				<div className="relative mb-[1vw] bg-[#ffffff] text-[#333333]">
+				<Search className="absolute left-[0.7vw] top-[0.7vw] text-[#333333]" />
+				<input 
+					type="text" 
+					placeholder="Search..." 
+					className={`w-full rounded-sm pl-[2.5vw] pr-[0.8vw] py-[0.5vw] focus:outline-none text-[0.9vw]`}
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+				/>
+				</div>
+				
+				{/* Toggle Buttons */}
+				<div className={`flex gap-[0.5vw] mb-[3vh] select-none rounded-sm p-[0.2vw] bg-[#3f51b5] shadow-lg`}>
+				<div onClick={() => setSelectedRole("students")} 
+					className={`${selectedRole === "students" ? `bg-[#4e5fbb]` : "bg-transparent"} flex-1 text-center py-[0.5vw] rounded-sm cursor-pointer font-bold`}>
+					Students</div>
+				<div onClick={() => setSelectedRole("teachers")} className={`${selectedRole === "teachers" ? `bg-[#4e5fbb]` : "bg-transparent"} flex-1 text-center py-[0.5vw] rounded-sm cursor-pointer font-bold`}>
+					Teachers</div>
+				</div>
+				
+				{/* Account List */}
+				<div className="space-y-[0.2vw]">
+				{selectedRole == "students" && filteredAccounts.length > 0 ? (
+					filteredAccounts.map((account, index) => (
+					<div key={index} className={`flex items-center gap-[0.5vw] p-[0.5vw] shadow-lg rounded-sm select-none bg-[#3f51b5] transition`}>
+						<img src={profileImage} className="w-[2.5vw] h-[2.5vw] rounded-full" alt="Profile" />
+						<p className="font-bold">{account}</p>
+						<div className={`ml-auto px-[1vw] py-[0.7vw] rounded-sm ${pending.includes(account) ? "bg-[#f4516c]" : "bg-[#4e5fbb]"} transition ${pending.includes(account) && "hover:bg-[#F33F5D]"} cursor-pointer`}
+						onClick={()=>{
+							if(!pending.includes(account)) setPending((prevItems) => [...prevItems, account]);
+							else setPending((prevItems) => prevItems.filter((item) => item !== account));
+							}}>
+						{pending.includes(account) ? "Cancel" : "Send Request"}
 						</div>
-						<div className='flex flex-col items-center mt-[0.6vw]'>
-							<p className='text-[1vw] font-bold select-none p-0 m-0'>
-								John Doe
-							</p>
-							<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
-								Student
-							</p>
-						</div>
-						<div className='w-full px-[1vw] flex flex-col gap-[1vh] items-center mt-[1vw]'></div>
 					</div>
+					))
+				) : (
+					<p className="text-gray-500">{searchQuery.length > 0 ? "No accounts found" : ""}</p>
+				)}
 				</div>
 			</div>
 		</div>
