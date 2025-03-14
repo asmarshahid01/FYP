@@ -27,7 +27,10 @@ function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path='/' element={<ProtectedRoute element={<StudentPage />} />} />
+				<Route
+					path='/'
+					element={<ProtectedRoute element={<TeacherPage />} />}
+				/>
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
 					path='/group'
