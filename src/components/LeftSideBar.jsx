@@ -1,4 +1,4 @@
-import { React, useState, useRef } from 'react';
+import { React, useState, useRef, useEffect } from 'react';
 import profileImage from '../assets/profile.jpg';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +10,7 @@ import {
 	ChevronRight,
 	ChevronLeft,
 } from 'lucide-react';
+import axios from 'axios';
 
 const LeftSideBar = () => {
 	const bgClr = 'bg-[#2a363b]';
@@ -18,7 +19,8 @@ const LeftSideBar = () => {
 	const borderBgClr = 'border-[#111820]';
 
 	const navigate = useNavigate();
-
+	const [name,setName]=useState('');
+	const [email,setEmail]=useState('');
 	const [bio, setBio] = useState('');
 	const [userInfoChanged, setUserInfoChanged] = useState(false);
 	const [userProfileExpand, setUserProfileExpand] = useState(false);
@@ -35,6 +37,34 @@ const LeftSideBar = () => {
 		}
 		setUserInfoChanged(true);
 	};
+
+	useEffect(()=>{
+		async function getDetails(){
+
+			try {
+				const token=localStorage.getItem("token");
+			if(!token){
+				console.error("No Token Found, User is not authenticated");
+				return;
+			}
+			const result=await axios.get("http://localhost:4000/api/student/info",{
+				headers:{
+					Authorization:`Bearer ${token}`
+				}
+			});
+			if(result.data){
+				const userDetails=result.data?.userDetails;
+				setName(userDetails.name||"");
+				setEmail(userDetails.email||"");
+				setBio(userDetails.profile||"");
+			}
+				
+			} catch (error) {
+				console.error("Error found ",error)
+			}
+		};
+		getDetails();
+	},[])
 
 	return (
 		<>
@@ -56,7 +86,7 @@ const LeftSideBar = () => {
 								/>
 								<div className='flex flex-col'>
 									<p className='text-[1vw] font-bold select-none p-0 m-0'>
-										John Doe
+										{name}
 									</p>
 									<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
 										Student
@@ -172,7 +202,7 @@ const LeftSideBar = () => {
 						</div>
 						<div className='flex flex-col items-center mt-[0.6vw]'>
 							<p className='text-[1vw] font-bold select-none p-0 m-0'>
-								John Doe
+								{name}
 							</p>
 							<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
 								Student
