@@ -30,6 +30,23 @@ const LeftSideBar = () => {
 	const [tempProfilePic, setTempProfilePic] = useState(profileImage);
 	const [profilePic, setProfilePic] = useState(profileImage);
 
+
+	const handleBioChange=async(e)=>{
+		try {
+			const token=localStorage.getItem("token");
+			const updateBio=await axios.put("http://localhost:4000/api/student/updateBio",{bio},{
+				headers:{
+					Authorization:`Bearer ${token}`
+				}
+			});
+			if(updateBio.status===200){
+				setBio(updateBio.data.bio)
+			}
+		} catch (error) {
+			console.error("Something Went Wrong "+error);
+		}
+	}
+
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
 		if (file) {
@@ -53,6 +70,7 @@ const LeftSideBar = () => {
 				}
 			});
 			if(result.data){
+				console.log(result)
 				const userDetails=result.data?.userDetails;
 				setName(userDetails.name||"");
 				setEmail(userDetails.email||"");
@@ -234,11 +252,12 @@ const LeftSideBar = () => {
 									userInfoChanged && 'hover:bg-[#1494f5]'
 								} duration-300 font-bold`}
 								onClick={() => {
+									handleBioChange();
 									setUserInfoChanged(false);
 									setProfilePic(tempProfilePic);
 								}}
 							>
-								Save
+								Save		
 							</div>
 						</div>
 					</div>

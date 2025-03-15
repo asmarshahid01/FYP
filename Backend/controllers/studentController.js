@@ -54,4 +54,19 @@ const getInfo = async (req, res) => {
   }
 };
 
-export { login, getInfo };
+const updateBio = async (req, res) => {
+  const userID = req.user.id;
+  if (!userID) {
+    res.status(400).json({ message: "Unauthorized User found", err });
+  }
+
+  const user = await Student.findById(userID);
+  if (!user) {
+    res.status(400).json({ message: "No Such User exists in the system", err });
+  }
+  user.profile=req.body.bio;
+  user.save();
+  res.status(200).json({message:"Updated Successfully",bio:req.body.bio});
+};
+
+export { login, getInfo, updateBio };
