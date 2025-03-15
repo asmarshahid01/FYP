@@ -1,4 +1,5 @@
-import { React, useState, useRef } from 'react';
+import { React, useState, useRef, useEffect } from 'react';
+import { debounce } from 'lodash';
 import profileImage from '../assets/profile.jpg';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +11,7 @@ import {
 	ChevronRight,
 	ChevronLeft,
 } from 'lucide-react';
+import axios from 'axios';
 
 const LeftSideBar = () => {
 	const bgClr = 'bg-[#2a363b]';
@@ -18,7 +20,8 @@ const LeftSideBar = () => {
 	const borderBgClr = 'border-[#111820]';
 
 	const navigate = useNavigate();
-
+	const [name,setName]=useState('');
+	const [email,setEmail]=useState('');
 	const [bio, setBio] = useState('');
 	const [userInfoChanged, setUserInfoChanged] = useState(false);
 	const [userProfileExpand, setUserProfileExpand] = useState(false);
@@ -28,6 +31,25 @@ const LeftSideBar = () => {
 	const [tempProfilePic, setTempProfilePic] = useState(profileImage);
 	const [profilePic, setProfilePic] = useState(profileImage);
 
+
+	const handleBioChange=async(e)=>{
+		try {
+			const token=localStorage.getItem("token");
+			const updateBio=await axios.put("http://localhost:4000/api/student/updateBio",{bio},{
+				headers:{
+					Authorization:`Bearer ${token}`
+				}
+			});
+			if(updateBio.status===200){
+				setBio(updateBio.data.bio)
+				console.log("Updated BIO")
+			}
+		} catch (error) {
+			console.error("Something Went Wrong "+error);
+		}
+	}
+	const debouncedSaveBio=debounce(()=>handleBioChange(),10000);
+
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
 		if (file) {
@@ -35,6 +57,35 @@ const LeftSideBar = () => {
 		}
 		setUserInfoChanged(true);
 	};
+
+	useEffect(()=>{
+		async function getDetails(){
+
+			try {
+				const token=localStorage.getItem("token");
+			if(!token){
+				console.error("No Token Found, User is not authenticated");
+				return;
+			}
+			const result=await axios.get("http://localhost:4000/api/student/info",{
+				headers:{
+					Authorization:`Bearer ${token}`
+				}
+			});
+			if(result.data){
+				console.log(result)
+				const userDetails=result.data?.userDetails;
+				setName(userDetails.name||"");
+				setEmail(userDetails.email||"");
+				setBio(userDetails.profile||"");
+			}
+				
+			} catch (error) {
+				console.error("Error found ",error)
+			}
+		};
+		getDetails();
+	},[])
 
 	return (
 		<>
@@ -56,7 +107,7 @@ const LeftSideBar = () => {
 								/>
 								<div className='flex flex-col'>
 									<p className='text-[1vw] font-bold select-none p-0 m-0'>
-										John Doe
+										{name}
 									</p>
 									<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
 										Student
@@ -172,7 +223,7 @@ const LeftSideBar = () => {
 						</div>
 						<div className='flex flex-col items-center mt-[0.6vw]'>
 							<p className='text-[1vw] font-bold select-none p-0 m-0'>
-								John Doe
+								{name}
 							</p>
 							<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
 								Student
@@ -204,11 +255,12 @@ const LeftSideBar = () => {
 									userInfoChanged && 'hover:bg-[#1494f5]'
 								} duration-300 font-bold`}
 								onClick={() => {
+									debouncedSaveBio();
 									setUserInfoChanged(false);
 									setProfilePic(tempProfilePic);
 								}}
 							>
-								Save
+								Save		
 							</div>
 						</div>
 					</div>
