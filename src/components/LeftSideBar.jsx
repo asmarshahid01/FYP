@@ -1,4 +1,5 @@
 import { React, useState, useRef, useEffect } from 'react';
+import { debounce } from 'lodash';
 import profileImage from '../assets/profile.jpg';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -41,11 +42,13 @@ const LeftSideBar = () => {
 			});
 			if(updateBio.status===200){
 				setBio(updateBio.data.bio)
+				console.log("Updated BIO")
 			}
 		} catch (error) {
 			console.error("Something Went Wrong "+error);
 		}
 	}
+	const debouncedSaveBio=debounce(()=>handleBioChange(),10000);
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
@@ -252,7 +255,7 @@ const LeftSideBar = () => {
 									userInfoChanged && 'hover:bg-[#1494f5]'
 								} duration-300 font-bold`}
 								onClick={() => {
-									handleBioChange();
+									debouncedSaveBio();
 									setUserInfoChanged(false);
 									setProfilePic(tempProfilePic);
 								}}
