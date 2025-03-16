@@ -44,32 +44,7 @@ const HomePage = () => {
 
 	const [content, setContent] = useState('');
 
-	const [posts, setPosts] = useState([
-		{
-			_id: "1",
-			author: { name: "Alice Johnson", pic: { url: "/images/alice.jpg" } },
-			content: "Excited to start my new project today!",
-			createdAt: "2024-03-05T08:30:00Z",
-		  },
-		  {
-			_id: "2",
-			author: { name: "Bob Smith", pic: { url: "/images/bob.jpg" } },
-			content: "Does anyone know a good resource for learning Tailwind CSS?",
-			createdAt: "2024-03-04T15:45:00Z",
-		  },
-		  {
-			_id: "3",
-			author: { name: "Charlie Brown", pic: { url: "/images/charlie.jpg" } },
-			content: "Finally deployed my website! 🎉",
-			createdAt: "2024-03-03T12:00:00Z",
-		  },
-		  {
-			_id: "4",
-			author: { name: "Charlie Brown", pic: { url: "/images/charlie.jpg" } },
-			content: "Finally deployed my website! 🎉",
-			createdAt: "2024-03-03T12:00:00Z",
-		  },
-	]);
+	const [posts, setPosts] = useState([]);
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
 	const initialRender = useRef(true);
