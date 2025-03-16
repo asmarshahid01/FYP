@@ -44,7 +44,32 @@ const HomePage = () => {
 
 	const [content, setContent] = useState('');
 
-	const [posts, setPosts] = useState([]);
+	const [posts, setPosts] = useState([
+		{
+			_id: "1",
+			author: { name: "Alice Johnson", pic: { url: "/images/alice.jpg" } },
+			content: "Excited to start my new project today!",
+			createdAt: "2024-03-05T08:30:00Z",
+		  },
+		  {
+			_id: "2",
+			author: { name: "Bob Smith", pic: { url: "/images/bob.jpg" } },
+			content: "Does anyone know a good resource for learning Tailwind CSS?",
+			createdAt: "2024-03-04T15:45:00Z",
+		  },
+		  {
+			_id: "3",
+			author: { name: "Charlie Brown", pic: { url: "/images/charlie.jpg" } },
+			content: "Finally deployed my website! 🎉",
+			createdAt: "2024-03-03T12:00:00Z",
+		  },
+		  {
+			_id: "4",
+			author: { name: "Charlie Brown", pic: { url: "/images/charlie.jpg" } },
+			content: "Finally deployed my website! 🎉",
+			createdAt: "2024-03-03T12:00:00Z",
+		  },
+	]);
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
 	const initialRender = useRef(true);
@@ -153,10 +178,10 @@ const HomePage = () => {
 			<LeftSideBar></LeftSideBar>
 
 			{/* Main Feed */}
-			<div className={`flex-1 p-[0.5vw] ${bgClr}`}>
+			<div className={`flex-1 py-[0.5vw] px-[5vw] ${bgClr} overflow-auto flex-col items-center`}>
 				<div className='flex items-center justify-center'>
 					<div
-						className={`relative w-2/3 mb-[1vw] ${fgClr} text-[#333333] flex gap-[0.5vw] items-center pl-[2.5vw] pr-[0.2vw] py-[0.2vw] `}
+						className={`relative w-full mb-[1vw] ${fgClr} text-[#333333] flex gap-[0.5vw] items-center pl-[2.5vw] pr-[0.2vw] py-[0.2vw] `}
 					>
 						<Search className='absolute left-[0.7vw] top-[0.7vw] text-[#333333]' />
 						<input
@@ -199,23 +224,21 @@ const HomePage = () => {
 						</div>
 					</div>
 				</div>
-				<div>
+				<div className='w-full flex flex-col items-start gap-[1vh]'>
 					<textarea
-						className='text-[#333333] border border-[#cccccc] rounded-sm p-[0.5vw] text-[1vw] focus:outline-none bg-white resize-none overflow-auto w-full'
+						className='text-[#333333] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none bg-white resize-none overflow-auto w-full'
 						placeholder='Write a post...'
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
-						rows={4}
+						rows={3}
 					/>
-					<button
-						className='h-[2.5vw] p-1.5 bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
-								rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2] mb-10'
-						onClick={handleCreatePost}
-					>
-						Create Post
-					</button>
+					<div
+						className='py-[0.6vw] px-[1vw] bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
+						rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2] mb-[2vw]'
+						onClick={handleCreatePost}>Create Post
+					</div>
 				</div>
-				<div className='h-full flex flex-col overflow-auto w-full'>
+				<div className='h-full flex flex-col'>
 					<InfiniteScroll
 						dataLength={posts.length}
 						next={fetchPosts}
