@@ -16,12 +16,6 @@ const postSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		requests: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Student',
-			},
-		],
 	},
 	{
 		timestamps: true,
