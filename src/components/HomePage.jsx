@@ -211,7 +211,7 @@ const HomePage = () => {
 						hasMore={hasMore}
 						loader={
 							<div className='flex items-center justify-center text-[#333333]'>
-								<p>Loading...</p>
+								<p className='text-[#aaaaaa]'>Loading...</p>
 							</div>
 						}
 						endMessage={<p style={{ textAlign: 'center' }}>No more posts</p>}

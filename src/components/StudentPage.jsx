@@ -120,14 +120,14 @@ const StudentPage = () => {
 			<div className={`flex-1 p-[0.5vw] ml-[3.3vw] ${bgClr}`}>
 				<div className='flex items-center justify-center'></div>
 				<div className='overflow-y-auto h-full p-[2vw] flex flex-col items-center'>
-					<div className='h-full flex flex-col'>
+					<div className='h-full flex flex-col w-full'>
 						<InfiniteScroll
 							dataLength={posts.length}
 							next={fetchPosts}
 							hasMore={hasMore}
 							loader={
 								<div className='flex items-center justify-center text-[#333333]'>
-									<p>Loading...</p>
+									<p className='text-[#aaaaaa]'>Loading...</p>
 								</div>
 							}
 							endMessage={<p style={{ textAlign: 'center' }}>No more posts</p>}
