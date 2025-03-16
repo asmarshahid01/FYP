@@ -37,6 +37,10 @@ function App() {
 					path='/home'
 					element={<ProtectedRoute element={<HomePage />} />}
 				/>
+				<Route
+					path='/profile/:userId'
+					element={<ProtectedRoute element={<StudentPage />} />}
+				/>
 				<Route path='/login' element={<LoginPage />} />
 			</Routes>
 		</Router>

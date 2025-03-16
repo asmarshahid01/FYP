@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Search, ChevronDown } from 'lucide-react';
 import '../tailwind.css';
@@ -19,6 +20,7 @@ const Card = ({ children, className, onClick }) => (
 );
 
 const HomePage = () => {
+	const navigate = useNavigate();
 	const token = localStorage.getItem('token');
 	const bgClr = 'bg-[#f2f3f8]';
 	const fgClr = 'bg-[#ffffff]';
@@ -65,8 +67,8 @@ const HomePage = () => {
 					},
 				}
 			);
-			alert('Post created successfully!');
 			setContent('');
+			window.location.reload();
 		} catch (error) {
 			console.log(error);
 		}
@@ -133,27 +135,14 @@ const HomePage = () => {
 		}
 	}, []);
 
-	const months = [
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec',
-	];
-
 	return (
 		<div className='flex absolute h-full w-full top-0 left-0 bg-darkgray-100 overflow-hidden'>
 			<LeftSideBar></LeftSideBar>
 
 			{/* Main Feed */}
-			<div className={`flex-1 py-[0.5vw] px-[5vw] ${bgClr} overflow-auto flex-col items-center`}>
+			<div
+				className={`flex-1 py-[0.5vw] px-[5vw] ${bgClr} overflow-auto flex-col items-center`}
+			>
 				<div className='flex items-center justify-center'>
 					<div
 						className={`relative w-full mb-[1vw] ${fgClr} text-[#333333] flex gap-[0.5vw] items-center pl-[2.5vw] pr-[0.2vw] py-[0.2vw] `}
@@ -210,7 +199,9 @@ const HomePage = () => {
 					<div
 						className='py-[0.6vw] px-[1vw] bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
 						rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2] mb-[2vw]'
-						onClick={handleCreatePost}>Create Post
+						onClick={handleCreatePost}
+					>
+						Create Post
 					</div>
 				</div>
 				<div className='h-full flex flex-col'>
@@ -218,14 +209,19 @@ const HomePage = () => {
 						dataLength={posts.length}
 						next={fetchPosts}
 						hasMore={hasMore}
-						loader={<h4>Loading...</h4>}
+						loader={
+							<div className='flex items-center justify-center text-[#333333]'>
+								<p>Loading...</p>
+							</div>
+						}
 						endMessage={<p style={{ textAlign: 'center' }}>No more posts</p>}
 					>
 						{posts.map((post) => (
 							<Card
 								key={post._id}
 								className='mb-[4vh] w-full text-[#333333] flex-1'
-								onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
+								//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
+								onClick={() => navigate(`/profile/${post.author?._id}`)}
 							>
 								<div className='flex items-center justify-between select-none text-[#333333]'>
 									<div className='flex items-center gap-[1vw]'>
@@ -261,7 +257,6 @@ const HomePage = () => {
 							</Card>
 						))}
 					</InfiniteScroll>
-					<span>invisible</span>
 				</div>
 			</div>
 

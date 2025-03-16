@@ -25,12 +25,19 @@ const createPost = async (req, res) => {
 const getPostsByAuthor = async (req, res) => {
 	try {
 		const { authorId } = req.params;
+		const page = parseInt(req.query.page) || 1;
+		const limit = 10;
+		const skip = (page - 1) * limit;
 
 		if (!authorId) {
 			return res.status(400).json({ error: 'Author ID is required' });
 		}
 
-		const posts = await Post.find({ author: authorId }).sort({ createdAt: -1 });
+		const posts = await Post.find({ author: authorId })
+			.populate('author')
+			.sort({ createdAt: -1 })
+			.skip(skip)
+			.limit(limit);
 		res.status(200).json(posts);
 	} catch (error) {
 		res

@@ -20,8 +20,8 @@ const LeftSideBar = () => {
 	const borderBgClr = 'border-[#111820]';
 
 	const navigate = useNavigate();
-	const [name,setName]=useState('');
-	const [email,setEmail]=useState('');
+	const [name, setName] = useState('');
+	const [email, setEmail] = useState('');
 	const [bio, setBio] = useState('');
 	const [userInfoChanged, setUserInfoChanged] = useState(false);
 	const [userProfileExpand, setUserProfileExpand] = useState(false);
@@ -31,24 +31,27 @@ const LeftSideBar = () => {
 	const [tempProfilePic, setTempProfilePic] = useState(profileImage);
 	const [profilePic, setProfilePic] = useState(profileImage);
 
-
-	const handleBioChange=async(e)=>{
+	const handleBioChange = async (e) => {
 		try {
-			const token=localStorage.getItem("token");
-			const updateBio=await axios.put("http://localhost:4000/api/student/updateBio",{bio},{
-				headers:{
-					Authorization:`Bearer ${token}`
+			const token = localStorage.getItem('token');
+			const updateBio = await axios.put(
+				'http://localhost:4000/api/student/updateBio',
+				{ bio },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
 				}
-			});
-			if(updateBio.status===200){
-				setBio(updateBio.data.bio)
-				console.log("Updated BIO")
+			);
+			if (updateBio.status === 200) {
+				setBio(updateBio.data.bio);
+				console.log('Updated BIO');
 			}
 		} catch (error) {
-			console.error("Something Went Wrong "+error);
+			console.error('Something Went Wrong ' + error);
 		}
-	}
-	const debouncedSaveBio=debounce(()=>handleBioChange(),10000);
+	};
+	const debouncedSaveBio = debounce(() => handleBioChange(), 10000);
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
@@ -58,39 +61,40 @@ const LeftSideBar = () => {
 		setUserInfoChanged(true);
 	};
 
-	useEffect(()=>{
-		async function getDetails(){
-
+	useEffect(() => {
+		async function getDetails() {
 			try {
-				const token=localStorage.getItem("token");
-			if(!token){
-				console.error("No Token Found, User is not authenticated");
-				return;
-			}
-			const result=await axios.get("http://localhost:4000/api/student/info",{
-				headers:{
-					Authorization:`Bearer ${token}`
+				const token = localStorage.getItem('token');
+				if (!token) {
+					console.error('No Token Found, User is not authenticated');
+					return;
 				}
-			});
-			if(result.data){
-				console.log(result)
-				const userDetails=result.data?.userDetails;
-				setName(userDetails.name||"");
-				setEmail(userDetails.email||"");
-				setBio(userDetails.profile||"");
-			}
-				
+				const result = await axios.get(
+					'http://localhost:4000/api/student/info',
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+				if (result.data) {
+					const userDetails = result.data?.userDetails;
+					setName(userDetails.name || '');
+					setEmail(userDetails.email || '');
+					setBio(userDetails.profile || '');
+				}
 			} catch (error) {
-				console.error("Error found ",error)
+				console.error('Error found ', error);
 			}
-		};
+		}
 		getDetails();
-	},[])
+	}, []);
 
 	return (
 		<>
 			<div
-				className={`w-1/7 h-full ${bgClr} shadow-md flex flex-col items-center gap-[5vh] border-r-[0.1vw] ${borderClr} relative`}>
+				className={`w-1/7 h-full ${bgClr} shadow-md flex flex-col items-center gap-[5vh] border-r-[0.1vw] ${borderClr} relative`}
+			>
 				{/* Profile Section (Absolute Positioning) */}
 				<div className='w-full p-[0.5vw] absolute top-0 left-0'>
 					<div
@@ -222,9 +226,7 @@ const LeftSideBar = () => {
 							></div>
 						</div>
 						<div className='flex flex-col items-center mt-[0.6vw]'>
-							<p className='text-[1vw] font-bold select-none p-0 m-0'>
-								{name}
-							</p>
+							<p className='text-[1vw] font-bold select-none p-0 m-0'>{name}</p>
 							<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
 								Student
 							</p>
@@ -260,7 +262,7 @@ const LeftSideBar = () => {
 									setProfilePic(tempProfilePic);
 								}}
 							>
-								Save		
+								Save
 							</div>
 						</div>
 					</div>
