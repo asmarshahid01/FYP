@@ -11,17 +11,17 @@ export default function ProfileBar({ user }) {
 
 	return (
 		<div className='h-full w-1/5 z-0 bg-[#f2f3f8] absolute top-0 left-0 left-1/7 border-r-[0.1vw] border-[#D3D7EE] flex items-center justify-center p-[2vw]'>
-			<div className='h-fit w-fit flex flex-col items-center justify-center gap-[2vh]'>
+			<div className='h-fit flex flex-col items-center justify-center gap-[2vh] min-w-full'>
 				<img
 					src={profilePic}
 					className='relative w-[8vw] h-[8vw] rounded-full shadow-lg'
 				/>
 				<div className='flex flex-col items-center text-[#666666]'>
 					<p className='text-[1.2vw] font-bold select-none p-0 m-0'>
-						{user.name}
+						{user.name ? user.name : "N/A"}
 					</p>
 					<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
-						{profileId == 1 ? 'Teacher' : profileId == 2 && 'Student'}
+						{profileId == 1 ? 'Teacher' : profileId == 2 ? 'Student' : "N/A"}
 					</p>
 				</div>
 				<div className='flex gap-[0.5vw] items-center mt-[1vh] self-start'>
@@ -30,12 +30,12 @@ export default function ProfileBar({ user }) {
 						href={`mailto:${user.email}`}
 						className='text-[#3f51b5] font-bold text-[0.9vw]'
 					>
-						{user.email}
+						{user.email ? user.email : "N/A"}
 					</a>
 				</div>
 				<div className='flex flex-col gap-[0.5vw] w-full'>
 					<p className='text-[#666666] font-bold text-[1vw]'>About:</p>
-					<p className='text-[#888888] text-[0.9vw]'>{user.profile}</p>
+					<p className='text-[#888888] text-[0.9vw]'>{user.profile ? user.profile : "N/A"}</p>
 				</div>
 				{profileId == 2 && (
 					<>
@@ -43,7 +43,7 @@ export default function ProfileBar({ user }) {
 							<p className='text-[#666666] font-bold text-[1vw]'>
 								Group Members:
 							</p>
-							{members.map((member, index) => (
+							{members.length > 0 ? members.map((member, index) => (
 								<div
 									key={index}
 									className='text-[#888888] text-[0.9vw] flex justify-between w-4/5'
@@ -51,11 +51,12 @@ export default function ProfileBar({ user }) {
 									<span>{member.name}</span>
 									<span>{member.rollNo}</span>
 								</div>
-							))}
+							)) : <p className='text-[#888888]'>No members</p>}
 						</div>
 						<div className='flex flex-col gap-[0.5vw] w-full'>
 							<p className='text-[#666666] font-bold text-[1vw]'>Supervisor:</p>
-							<p className='text-[#888888] text-[0.9vw]'>{supervisor}</p>
+							{supervisor ? <p className='text-[#888888] text-[0.9vw]'>{supervisor}</p> :
+							<p className='text-[#888888]'>No supervisor</p>}
 						</div>
 					</>
 				)}
