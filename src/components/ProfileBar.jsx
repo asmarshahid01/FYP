@@ -2,7 +2,6 @@ import { React, useState } from 'react';
 import profilePic from '../assets/profile.jpg';
 
 export default function ProfileBar({ user }) {
-	console.log(user);
 	const profileId = 2;
 	const members = [];
 	const supervisor = '';
