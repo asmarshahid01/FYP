@@ -18,10 +18,16 @@ export default function LoginPage() {
 				'http://localhost:4000/api/student/login',
 				loginData
 			);
-			const { token } = response.data;
+			const { token, usertype, userdetails } = response.data;
 			if (token) {
 				localStorage.setItem('token', token);
 				console.log('Token stored');
+			}
+			if (usertype) {
+				localStorage.setItem('usertype', usertype);
+			}
+			if (userdetails) {
+				localStorage.setItem('userdetails', JSON.stringify(userdetails));
 			}
 			navigate('/home');
 			console.log('User signed up successfully:', response.data);

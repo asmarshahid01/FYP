@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import axios from 'axios';
 import { Search, ChevronDown } from 'lucide-react';
 import '../tailwind.css';
 import LeftSideBar from './LeftSideBar';
 import profileImage from '../assets/profile.jpg';
 import postImage from '../assets/post.jpg';
 import ProfileBar from './ProfileBar';
+import { format } from 'date-fns';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const Card = ({ children, className, onClick }) => (
 	<div
@@ -16,6 +19,7 @@ const Card = ({ children, className, onClick }) => (
 );
 
 const HomePage = () => {
+	const token = localStorage.getItem('token');
 	const bgClr = 'bg-[#f2f3f8]';
 	const fgClr = 'bg-[#ffffff]';
 	const borderClr = 'border-[#282e3b]';
@@ -38,6 +42,36 @@ const HomePage = () => {
 		'Charlie White',
 	]);
 
+	const [content, setContent] = useState('');
+
+	const [posts, setPosts] = useState([]);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
+	const initialRender = useRef(true);
+
+	const handleCreatePost = async () => {
+		if (!content.trim()) return alert('Post content cannot be empty.');
+
+		try {
+			const response = await axios.post(
+				'http://localhost:4000/api/post',
+				{
+					authorModel: localStorage.getItem('usertype'),
+					content,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			alert('Post created successfully!');
+			setContent('');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	// Filter accounts based on search query and selected role
 	const filteredAccounts = useMemo(() => {
 		return accounts.filter((account) => {
@@ -48,6 +82,10 @@ const HomePage = () => {
 			);
 		});
 	}, [accounts, searchQuery, selectedRole]);
+
+	const formatDate = (timestamp) => {
+		return format(new Date(timestamp), 'MMM d, yyyy hh:mm a');
+	};
 
 	useEffect(() => {
 		function handleClickOutside(event) {
@@ -65,22 +103,35 @@ const HomePage = () => {
 		};
 	}, [isOpen]);
 
-	const [posts, setPosts] = useState([
-		{
-			profilePic: profileImage,
-			name: 'Sir Zeeshan',
-			postedDate: 3,
-			postedDay: 'Monday',
-			postedMonth: 2,
-			postedYear: 2025,
-			postedHour: 12,
-			postedMin: 30,
-			content: 'Hello, found this amazing',
-			images: [postImage],
-			request: true,
-			requestSent: false,
-		},
-	]);
+	const fetchPosts = async () => {
+		if (!hasMore) return;
+		try {
+			const res = await axios.get(
+				`http://localhost:4000/api/post?page=${page}`,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			const newPosts = res.data;
+			if (newPosts.length === 0) {
+				setHasMore(false);
+			} else {
+				setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+				setPage((prevPage) => prevPage + 1);
+			}
+		} catch (error) {
+			console.error('Error fetching posts:', error);
+		}
+	};
+
+	useEffect(() => {
+		if (initialRender.current) {
+			fetchPosts();
+			initialRender.current = false;
+		}
+	}, []);
 
 	const months = [
 		'Jan',
@@ -148,72 +199,71 @@ const HomePage = () => {
 						</div>
 					</div>
 				</div>
-				<div className='overflow-y-auto h-full p-[2vw] flex flex-col items-center'>
-					{posts.map((post, index) => (
-						<Card
-							key={index}
-							className='p-[1vw] h-fit mb-[4vh] w-5/6 text-[#333333]'
-							onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-						>
-							<div className='flex items-center justify-between select-none text-[#333333]'>
-								<div className='flex items-center gap-[1vw]'>
-									<img
-										src={post.profilePic}
-										className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
-										alt='profile'
-									/>
-									<div>
-										<p className='font-bold'>{post.name}</p>
-										<p className='text-gray-500'>
-											{post.postedDay}, {months[post.postedMonth]}{' '}
-											{post.postedDate} {post.postedHour}:{post.postedMin}
-										</p>
+				<div>
+					<textarea
+						className='text-[#333333] border border-[#cccccc] rounded-sm p-[0.5vw] text-[1vw] focus:outline-none bg-white resize-none overflow-auto w-full'
+						placeholder='Write a post...'
+						value={content}
+						onChange={(e) => setContent(e.target.value)}
+						rows={4}
+					/>
+					<button
+						className='h-[2.5vw] p-1.5 bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
+								rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2] mb-10'
+						onClick={handleCreatePost}
+					>
+						Create Post
+					</button>
+				</div>
+				<div className='h-full flex flex-col overflow-auto w-full'>
+					<InfiniteScroll
+						dataLength={posts.length}
+						next={fetchPosts}
+						hasMore={hasMore}
+						loader={<h4>Loading...</h4>}
+						endMessage={<p style={{ textAlign: 'center' }}>No more posts</p>}
+					>
+						{posts.map((post) => (
+							<Card
+								key={post._id}
+								className='mb-[4vh] w-full text-[#333333] flex-1'
+								onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
+							>
+								<div className='flex items-center justify-between select-none text-[#333333]'>
+									<div className='flex items-center gap-[1vw]'>
+										<img
+											src={post.author?.pic?.url || profileImage}
+											className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
+											alt='profile'
+										/>
+										<div>
+											<p className='font-bold'>{post.author?.name}</p>
+											<p className='text-gray-500'>
+												{formatDate(post.createdAt)}
+											</p>
+										</div>
 									</div>
 								</div>
-							</div>
-							<p className='mt-[0.5vw]'>{post.content}</p>
-							<div className='flex gap-[0.5vw] w-full mt-[2vh]'>
-								<input
-									type='text'
-									value={requestMsg}
-									onChange={(e) => setRequestMsg(e.target.value)}
-									placeholder='Request Message'
-									className='text-[#888888] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none flex-[8]'
-								/>
-								<div
-									className='h-[2.5vw] w-full bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
-                                rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2]'
-								>
-									Request
+								<p className='mt-[0.5vw]'>{post.content}</p>
+								<div className='flex gap-[0.5vw] w-full mt-[2vh]'>
+									<input
+										type='text'
+										value={requestMsg}
+										onChange={(e) => setRequestMsg(e.target.value)}
+										placeholder='Request Message'
+										className='text-[#888888] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none flex-[8]'
+									/>
+									<div
+										className='h-[2.5vw] w-full bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
+								rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2]'
+									>
+										Request
+									</div>
 								</div>
-							</div>
-							{/* <div className="mt-[0.5vw] flex">
-                  <input 
-                  type="text" 
-                  placeholder="Type a message..." 
-                  className={`w-full rounded-sm px-[0.8vw] py-[0.5vw] bg-[#ffffff] text-[#333333] focus:outline-none text-[0.9vw]`}
-                />
-                <p className={`${post.request && !post.requestSent ? "bg-[#3f51b5]" : "bg-[#355c7d]"} text-[#eeeeee] w-[8vw] px-[1vw] py-[0.5vw] rounded-sm
-                ${post.request && !post.requestSent && "cursor-pointer"} ${post.request && !post.requestSent ? "hover:bg-[#4e5fbb]" : "bg-[#355c7d"} duration-300
-                flex items-center justify-center select-none`}
-                onClick={()=>{
-                  if(post.request && !post.requestSent) {
-                    setPosts((prevPosts) =>
-                      prevPosts.map((post, idx) =>
-                        idx === index ? { ...post, requestSent: true } : post
-                      )
-                    );
-                  } else if(post.request && post.requestSent) {
-                    setPosts((prevPosts) =>
-                      prevPosts.map((post, idx) =>
-                        idx === index ? { ...post, requestSent: false } : post
-                      )
-                    );
-                  }
-                }}>{post.requestSent ? "Cancel" : "Send Request"}</p>
-              </div> */}
-						</Card>
-					))}
+							</Card>
+						))}
+					</InfiniteScroll>
+					<span>invisible</span>
 				</div>
 			</div>
 
