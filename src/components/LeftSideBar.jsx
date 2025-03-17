@@ -25,6 +25,7 @@ const LeftSideBar = () => {
 	const [bio, setBio] = useState('');
 	const [userInfoChanged, setUserInfoChanged] = useState(false);
 	const [userProfileExpand, setUserProfileExpand] = useState(false);
+	const [userImage,setUserImage]=useState(false);
 	const [selectedMenu, setSelectedMenu] = useState(1);
 
 	const fileInputRef = useRef(null);
@@ -34,15 +35,21 @@ const LeftSideBar = () => {
 	const handleBioChange = async (e) => {
 		try {
 			const token = localStorage.getItem('token');
-			const updateBio = await axios.put(
-				'http://localhost:4000/api/student/updateBio',
-				{ bio },
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
+			const formData=new FormData();
+			formData.append("bio",bio);
+			formData.append("rollNumber",email.substring(0,7));
+			formData.append("image",profilePic);
+			for (let pair of formData.entries()) {
+				console.log(pair[0], pair[1]);
+			  }
+			
+			
+			const updateBio = await axios.put("http://localhost:4000/api/student/updateBio", formData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "multipart/form-data",
+				},
+			});
 			if (updateBio.status === 200) {
 				setBio(updateBio.data.bio);
 				console.log('Updated BIO');
@@ -56,7 +63,9 @@ const LeftSideBar = () => {
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
 		if (file) {
+			setProfilePic(file);
 			setTempProfilePic(URL.createObjectURL(file));
+			setUserImage(true);
 		}
 		setUserInfoChanged(true);
 	};
@@ -82,6 +91,11 @@ const LeftSideBar = () => {
 					setName(userDetails.name || '');
 					setEmail(userDetails.email || '');
 					setBio(userDetails.profile || '');
+
+					if (userDetails.imageUrl) {
+						setUserImage(false);
+						setProfilePic(`http://localhost:4000${userDetails.imageUrl}`);
+					}
 				}
 			} catch (error) {
 				console.error('Error found ', error);
@@ -106,7 +120,7 @@ const LeftSideBar = () => {
 							{/* User Info */}
 							<div className='flex items-center w-full gap-[0.5vw]'>
 								<img
-									src={profilePic}
+									src={userImage?tempProfilePic:profilePic}
 									className='w-[2vw] h-[2vw] rounded-full'
 								/>
 								<div className='flex flex-col'>
@@ -215,7 +229,7 @@ const LeftSideBar = () => {
 							/>
 
 							<img
-								src={tempProfilePic}
+								src={userImage?tempProfilePic:profilePic}
 								className='w-full h-full rounded-full cursor-pointer'
 								onClick={() => fileInputRef.current.click()}
 							/>
@@ -259,7 +273,6 @@ const LeftSideBar = () => {
 								onClick={() => {
 									debouncedSaveBio();
 									setUserInfoChanged(false);
-									setProfilePic(tempProfilePic);
 								}}
 							>
 								Save
