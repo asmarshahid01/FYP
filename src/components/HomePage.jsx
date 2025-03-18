@@ -34,10 +34,6 @@ const HomePage = () => {
 	const dropdownRef = useRef(null);
 
 
-	const [selectedRole, setSelectedRole] = useState('students');
-	const [searchQuery, setSearchQuery] = useState('');
-	const [results,setResults]=useState([]);
-
 
 	const [pending, setPending] = useState([]);
 	const [accounts] = useState([
@@ -55,35 +51,6 @@ const HomePage = () => {
 	const [hasMore, setHasMore] = useState(true);
 	const initialRender = useRef(true);
 
-
-
-	const debouncedSearch =useCallback(debounce(async (searchQuery, searchType) => {
-        if (!searchQuery) return;
-		const token = localStorage.getItem('token');
-
-        try {
-			console.log(searchQuery);
-			console.log(searchType);
-            const response = await axios.get(`http://localhost:4000/api/search/fypSearch`, {
-                params: { query: searchQuery, type: searchType },
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-            });
-			console.log(response.data);
-            setResults(response.data.results);
-        } catch (err) {
-            console.log("Error in Something related Search");
-        }
-    }, 1000,{leading:false,trailing:true}),[]);
-
-	useEffect(() => {
-        if (searchQuery.length >= 4) {
-            debouncedSearch(searchQuery, selectedRole);
-        } else {
-            setResults([]);
-        }
-    }, [searchQuery, selectedRole]);
 
 	const handleCreatePost = async () => {
 		if (!content.trim()) return alert('Post content cannot be empty.');
