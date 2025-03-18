@@ -5,11 +5,11 @@ import { Search, ChevronDown } from 'lucide-react';
 import '../tailwind.css';
 import LeftSideBar from './LeftSideBar';
 import profileImage from '../assets/profile.jpg';
-import postImage from '../assets/post.jpg';
 import ProfileBar from './ProfileBar';
 import { format } from 'date-fns';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { debounce } from 'lodash';
+import RightSideBar from './RightSideBar';
 
 const Card = ({ children, className, onClick }) => (
 	<div
@@ -30,9 +30,9 @@ const HomePage = () => {
 
 	const [selectedOption, setSelectedOption] = useState('All');
 	const [isOpen, setIsOpen] = useState(false);
-	const [rightSideBarExpand, setRightSideBarExpand] = useState(false);
 	const [requestMsg, setRequestMsg] = useState('');
 	const dropdownRef = useRef(null);
+
 
 	const [selectedRole, setSelectedRole] = useState('students');
 	const [searchQuery, setSearchQuery] = useState('');
@@ -107,6 +107,7 @@ const HomePage = () => {
 			console.log(error);
 		}
 	};
+
 
 	// Filter accounts based on search query and selected role
 	// const filteredAccounts = useMemo(() => {
