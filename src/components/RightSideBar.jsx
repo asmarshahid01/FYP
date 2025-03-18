@@ -1,11 +1,15 @@
-import {React, useState, useMemo} from 'react'
+import {React, useState, useMemo,useCallback,useEffect} from 'react'
 import profileImage from '../assets/post.jpg';
 import { Search } from 'lucide-react';
+import { debounce } from 'lodash';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function RightSideBar() {
     const [selectedRole, setSelectedRole] = useState('students');
     const [searchQuery, setSearchQuery] = useState('');
     const [pending, setPending] = useState([]);
+    const [results,setResults]=useState([]);
     const [accounts] = useState([
             'John Doe',
             'Jane Smith',
@@ -15,6 +19,37 @@ export default function RightSideBar() {
         ]);
 
     const bgClr = 'bg-[#f2f3f8]';
+    const navigate=useNavigate();
+
+
+    const debouncedSearch =useCallback(debounce(async (searchQuery, searchType) => {
+            if (!searchQuery) return;
+            const token = localStorage.getItem('token');
+    
+            try {
+                console.log(searchQuery);
+                console.log(searchType);
+                const response = await axios.get(`http://localhost:4000/api/search/fypSearch`, {
+                    params: { query: searchQuery, type: searchType },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log(response.data);
+                setResults(response.data.results);
+            } catch (err) {
+                console.log("Error in Something related Search");
+            }
+        }, 1000,{leading:false,trailing:true}),[]);
+    
+        useEffect(() => {
+            if (searchQuery.length >= 4) {
+                debouncedSearch(searchQuery, selectedRole);
+            } else {
+                setResults([]);
+            }
+        }, [searchQuery, selectedRole]);
+
 
     // Filter accounts based on search query and selected role
         const filteredAccounts = useMemo(() => {
@@ -64,18 +99,18 @@ export default function RightSideBar() {
 
             {/* Account List */}
             <div className='space-y-[0.2vw]'>
-                {selectedRole == 'students' && filteredAccounts.length > 0 ? (
-                    filteredAccounts.map((account, index) => (
+                {selectedRole == 'students' && results.length > 0 ? (
+                    results.map((account, index) => (
                         <div
-                            key={index}
+                            key={account._id}
                             className={`flex items-center gap-[0.5vw] p-[0.5vw] shadow-lg rounded-sm select-none bg-[#3f51b5] transition`}
+                            onClick={()=>navigate(`/profile/${account._id}`)}
                         >
                             <img
-                                src={profileImage}
+                                src={account?.imageUrl?`http://localhost:4000${account.imageUrl}`:profileImage}
                                 className='w-[2.5vw] h-[2.5vw] rounded-full'
-                                alt='Profile'
                             />
-                            <p className='font-bold'>{account}</p>
+                            <p className='font-bold'>{account.name}</p>
                             <div
                                 className={`ml-auto px-[1vw] py-[0.7vw] rounded-sm ${
                                     pending.includes(account) ? 'bg-[#f4516c]' : 'bg-[#4e5fbb]'

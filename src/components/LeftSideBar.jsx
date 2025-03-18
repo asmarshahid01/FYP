@@ -207,7 +207,7 @@ const LeftSideBar = () => {
 				<button
 					onClick={() => {
 						localStorage.removeItem('token');
-						navigate('/');
+						navigate('/login');
 					}}
 					className={`mt-auto ${fgClr} px-[1vw] py-[1vw] border-l-[0.2vw] border-l-[#f4516c] hover:text-[#f4516c] cursor-pointer hover:border-t-[#f4516c] hover:border-b-[#f4516c] border border-transparent duration-300 w-full font-bold select-none flex gap-[0.5vw]`}
 				>
