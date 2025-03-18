@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Search, ChevronDown } from 'lucide-react';
@@ -9,6 +9,7 @@ import postImage from '../assets/post.jpg';
 import ProfileBar from './ProfileBar';
 import { format } from 'date-fns';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { debounce } from 'lodash';
 
 const Card = ({ children, className, onClick }) => (
 	<div
@@ -35,6 +36,9 @@ const HomePage = () => {
 
 	const [selectedRole, setSelectedRole] = useState('students');
 	const [searchQuery, setSearchQuery] = useState('');
+	const [results,setResults]=useState([]);
+
+
 	const [pending, setPending] = useState([]);
 	const [accounts] = useState([
 		'John Doe',
@@ -50,6 +54,36 @@ const HomePage = () => {
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
 	const initialRender = useRef(true);
+
+
+
+	const debouncedSearch =useCallback(debounce(async (searchQuery, searchType) => {
+        if (!searchQuery) return;
+		const token = localStorage.getItem('token');
+
+        try {
+			console.log(searchQuery);
+			console.log(searchType);
+            const response = await axios.get(`http://localhost:4000/api/search/fypSearch`, {
+                params: { query: searchQuery, type: searchType },
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+            });
+			console.log(response.data);
+            setResults(response.data.results);
+        } catch (err) {
+            console.log("Error in Something related Search");
+        }
+    }, 1000,{leading:false,trailing:true}),[]);
+
+	useEffect(() => {
+        if (searchQuery.length >= 4) {
+            debouncedSearch(searchQuery, selectedRole);
+        } else {
+            setResults([]);
+        }
+    }, [searchQuery, selectedRole]);
 
 	const handleCreatePost = async () => {
 		if (!content.trim()) return alert('Post content cannot be empty.');
@@ -75,15 +109,15 @@ const HomePage = () => {
 	};
 
 	// Filter accounts based on search query and selected role
-	const filteredAccounts = useMemo(() => {
-		return accounts.filter((account) => {
-			return (
-				account.toLowerCase().includes(searchQuery.toLowerCase()) &&
-				(selectedRole === 'students' || selectedRole === 'teachers') &&
-				searchQuery.length > 0
-			);
-		});
-	}, [accounts, searchQuery, selectedRole]);
+	// const filteredAccounts = useMemo(() => {
+	// 	return accounts.filter((account) => {
+	// 		return (
+	// 			account.toLowerCase().includes(searchQuery.toLowerCase()) &&
+	// 			(selectedRole === 'students' || selectedRole === 'teachers') &&
+	// 			searchQuery.length > 0
+	// 		);
+	// 	});
+	// }, [accounts, searchQuery, selectedRole]);
 
 	const formatDate = (timestamp) => {
 		return format(new Date(timestamp), 'MMM d, yyyy hh:mm a');
@@ -288,7 +322,7 @@ const HomePage = () => {
 						Students
 					</div>
 					<div
-						onClick={() => setSelectedRole('teachers')}
+						onClick={() => setSelectedRole('supervisor')}
 						className={`${
 							selectedRole === 'teachers' ? `bg-[#4e5fbb]` : 'bg-transparent'
 						} flex-1 text-center py-[0.5vw] rounded-sm cursor-pointer font-bold`}
@@ -299,10 +333,10 @@ const HomePage = () => {
 
 				{/* Account List */}
 				<div className='space-y-[0.2vw]'>
-					{selectedRole == 'students' && filteredAccounts.length > 0 ? (
-						filteredAccounts.map((account, index) => (
+					{selectedRole == 'students' && results.length > 0 ? (
+						results.map((account, index) => (
 							<div
-								key={index}
+								key={account._id}
 								className={`flex items-center gap-[0.5vw] p-[0.5vw] shadow-lg rounded-sm select-none bg-[#3f51b5] transition`}
 							>
 								<img
@@ -310,15 +344,15 @@ const HomePage = () => {
 									className='w-[2.5vw] h-[2.5vw] rounded-full'
 									alt='Profile'
 								/>
-								<p className='font-bold'>{account}</p>
+								<p className='font-bold' onClick={()=>navigate(`/profile/${account._id}`)}>{account.name}</p>
 								<div
 									className={`ml-auto px-[1vw] py-[0.7vw] rounded-sm ${
-										pending.includes(account) ? 'bg-[#f4516c]' : 'bg-[#4e5fbb]'
+										pending.includes(account.name) ? 'bg-[#f4516c]' : 'bg-[#4e5fbb]'
 									} transition ${
-										pending.includes(account) && 'hover:bg-[#F33F5D]'
+										pending.includes(account.name) && 'hover:bg-[#F33F5D]'
 									} cursor-pointer`}
 									onClick={() => {
-										if (!pending.includes(account))
+										if (!pending.includes(account.name))
 											setPending((prevItems) => [...prevItems, account]);
 										else
 											setPending((prevItems) =>
@@ -326,7 +360,7 @@ const HomePage = () => {
 											);
 									}}
 								>
-									{pending.includes(account) ? 'Cancel' : 'Send Request'}
+									{pending.includes(account.name) ? 'Cancel' : 'Send Request'}
 								</div>
 							</div>
 						))
