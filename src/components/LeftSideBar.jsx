@@ -10,14 +10,15 @@ import {
 	LogOut,
 	ChevronRight,
 	ChevronLeft,
+	Bell
 } from 'lucide-react';
 import axios from 'axios';
+import Notifications from './Notifications';
 
 const LeftSideBar = () => {
 	const bgClr = 'bg-[#2a363b]';
 	const fgClr = 'bg-[#292b3a]';
 	const borderClr = 'border-[#282e3b]';
-	const borderBgClr = 'border-[#111820]';
 
 	const navigate = useNavigate();
 	const [name, setName] = useState('');
@@ -31,6 +32,7 @@ const LeftSideBar = () => {
 	const fileInputRef = useRef(null);
 	const [tempProfilePic, setTempProfilePic] = useState(profileImage);
 	const [profilePic, setProfilePic] = useState(profileImage);
+	const [notificationsExpand, setNotificationsExpand] = useState(false);
 
 	const handleBioChange = async (e) => {
 		try {
@@ -150,6 +152,7 @@ const LeftSideBar = () => {
 						onClick={() => {
 							setSelectedMenu(1);
 							navigate('/home');
+							setNotificationsExpand(false);
 						}}
 					>
 						<Home /> Dashboard
@@ -163,6 +166,7 @@ const LeftSideBar = () => {
 						onClick={() => {
 							setSelectedMenu(2);
 							navigate('/inbox');
+							setNotificationsExpand(false);
 						}}
 					>
 						<Mail /> Inbox
@@ -176,6 +180,7 @@ const LeftSideBar = () => {
 						onClick={() => {
 							setSelectedMenu(3);
 							navigate('/group');
+							setNotificationsExpand(false);
 						}}
 					>
 						<Users /> FYP Group
@@ -186,9 +191,15 @@ const LeftSideBar = () => {
 						} ${selectedMenu == 4 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
       cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
       duration-300 font-bold flex gap-[0.5vw]`}
-						onClick={() => setSelectedMenu(4)}
+						onClick={() => {setSelectedMenu(4);
+							setNotificationsExpand(false);}}
 					>
 						<FileText /> Deliverables
+					</div>
+					<div className={`px-[1vw] py-[1vw] ${selectedMenu == 5 ? fgClr : bgClr} ${selectedMenu == 5 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
+					cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
+					duration-300 font-bold flex gap-[0.5vw]`} onClick={() => {setSelectedMenu(5); setNotificationsExpand(!notificationsExpand)}}>
+						<Bell /> Notifications
 					</div>
 				</nav>
 
@@ -281,6 +292,7 @@ const LeftSideBar = () => {
 					</div>
 				</div>
 			</div>
+			<Notifications notificationsExpand={notificationsExpand} />
 		</>
 	);
 };

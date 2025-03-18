@@ -10,7 +10,14 @@ const FYPGroupPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const options = ["Development", "R&D"];
   
-  const [pending, setPending] = useState(["Alice", "Bob", "Charlie"]);
+  const [pending, setPending] = useState([{
+      name: "Alice",
+      msg: "lorem ipsum text etc etc adkjsakdjsakldsakldsa"
+    }, {name: "Bob",
+        msg: "lorem ipsum text"
+    }, {name: "Charlie",
+        msg: "lorem ipsum text etc etc adkjsakdjsakldsakldsasad sakdljsad ksajdlksa"
+    },]);
   const [groupMembers, setGroupMembers] = useState([{
 	name: "Me",
 	admin: true,
@@ -23,7 +30,8 @@ const FYPGroupPage = () => {
 		name: "Bob",
 		month: 2,
 		date: 22,
-		year: 2025
+		year: 2025,
+    msg: "lorem ipsum text etc etc adkjsakdjsakldsakldsasad sakdljsad ksajdlksa"
   }])
 
   const bgClr = "bg-[#f2f3f8]";
@@ -120,16 +128,19 @@ const FYPGroupPage = () => {
               <thead>
                 <tr className={`bg-[#3f51b5] text-white`}>
                   <th className="px-[1vw] py-[0.7vw] text-left">User</th>
-                  <th className="px-[1vw] py-[0.7vw] text-left">Sent on</th>
+                  <th className="px-[1vw] py-[0.7vw] text-left">Received on</th>
                   <th className="px-[1vw] py-[0.7vw] text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {receivedRequests.length > 0 ? receivedRequests.map((user, index) => (
                   <tr key={index} className={index%2==0 ? "bg-[#ffffff]" : "bg-[#f7f7f7]"}>
-                    <td className="px-[1vw] py-[0.7vw] flex items-center gap-[0.5vw] font-bold">
+                    <td className="pl-[1vw] py-[0.7vw] flex items-center gap-[0.5vw] font-bold max-w-fit">
                       <img src={profileImage} className="w-[2.5vw] h-[2.5vw] rounded-full" alt="Profile" />
-                      <p className="text-[#4e5fbb]">{user.name}</p>
+                      <div className="max-w-fit">
+                        <p className="text-[#4e5fbb]">{user.name}</p>
+                        <p className="font-normal opacity-50 max-w-[50ch]">{user.msg}</p>
+                      </div>
                     </td>
                     <td className="text-[#99A1D6]">{months[user.month]} {user.date}, {user.year}</td>
                     <td className="px-[1vw] py-[0.7vw]">
@@ -148,7 +159,7 @@ const FYPGroupPage = () => {
             </table>
         </div>
 
-        {/* Pending Requests */}
+        {/* Sent Requests */}
         <h2 className="text-xl font-bold mt-[5vh] mb-[1vh] text-[#4e5fbb]">Sent Requests</h2>
         <div className="overflow-x-auto w-3/4">
           <table className="min-w-full table-auto border-collapse select-none rounded-sm shadow-lg">
@@ -164,9 +175,12 @@ const FYPGroupPage = () => {
                   <tr key={index} className={index%2==0 ? "bg-[#ffffff]" : "bg-[#f7f7f7]"}>
                     <td className="px-[1vw] py-[0.7vw] flex items-center gap-[0.5vw] font-bold">
                       <img src={profileImage} className="w-[2.5vw] h-[2.5vw] rounded-full" alt="Profile" />
-                      <p className="text-[#4e5fbb]">{user}</p>
+                      <div>
+                        <p className="text-[#4e5fbb]">{user.name}</p>
+                        <p className="font-normal opacity-50 truncate w-[25ch]">{user.msg}</p>
+                      </div>
                     </td>
-                    <td className="text-[#99A1D6]">Feb 22, 2025</td>
+                    <td className="text-[#99A1D6] pl-[0.4vw]">Feb 22, 2025</td>
                     <td className="px-[1vw] py-[0.7vw]">
                       <div
                         className={`inline-block bg-[#f4516c] font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#F33F5D] text-white transition`}
