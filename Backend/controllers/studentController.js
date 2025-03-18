@@ -49,7 +49,6 @@ const updateBio = async (req, res) => {
     // Get the temporary file path from multer
     const tempFilePath = req.file.path; // Check this path in logs
 
-    console.log("Uploaded Temp File Path:", tempFilePath);
 
     // Define the upload directory
     const uploadDir = path.join(__dirname, '..', 'uploads', 'students');
@@ -169,5 +168,8 @@ const getStudentbyId = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
 
 export { login, getInfo, updateBio, getStudentbyId, upload };

@@ -5,10 +5,13 @@ import bcrypt from 'bcrypt';
 import Student from './models/student.js';
 import studentRoutes from './routes/studentRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import searchRoutes from './routes/searchRoutes.js';
 import cors from 'cors';
 
 
+
 await connect();
+
 
 const app = express();
 
@@ -25,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use('/api/student', studentRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/search',searchRoutes);
 
 app.listen(port, () => {
 	console.log('SERVER IS ON!!');
