@@ -7,10 +7,14 @@ import studentRoutes from './routes/studentRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import cors from 'cors';
 
+
 await connect();
 
 const app = express();
+
+
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 const port = 4000;
 const corsOptions = {
 	origin: 'http://localhost:3000',
