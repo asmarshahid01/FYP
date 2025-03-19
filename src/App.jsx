@@ -13,6 +13,8 @@ import FYPGroupPage from './components/fypgroup';
 import LoginPage from './components/LoginPage';
 import StudentPage from './components/StudentPage';
 import TeacherPage from './components/TeacherPage';
+import SupervisorHomePage from './components/SupervisorHomePage';
+import FypGroupDetails from './components/FypGroupDetails';
 
 // function App() {
 // 	return (
@@ -27,11 +29,11 @@ function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path='/' element={<ProtectedRoute element={<HomePage />} />} />
+				<Route path='/' element={<ProtectedRoute element={<SupervisorHomePage />} />} />
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
 					path='/group'
-					element={<ProtectedRoute element={<FYPGroupPage />} />}
+					element={<ProtectedRoute element={<FypGroupDetails />} />}
 				/>
 				<Route
 					path='/home'
