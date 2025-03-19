@@ -20,6 +20,8 @@ const LeftSideBar = () => {
 	const fgClr = 'bg-[#292b3a]';
 	const borderClr = 'border-[#282e3b]';
 
+	const accountType = "supervisor";
+
 	const navigate = useNavigate();
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -185,7 +187,7 @@ const LeftSideBar = () => {
 					>
 						<Users /> FYP Group
 					</div>
-					<div
+					{accountType == "student" && <div
 						className={`px-[1vw] py-[1vw] ${
 							selectedMenu == 4 ? fgClr : bgClr
 						} ${selectedMenu == 4 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
@@ -195,7 +197,7 @@ const LeftSideBar = () => {
 							setNotificationsExpand(false);}}
 					>
 						<FileText /> Deliverables
-					</div>
+					</div>}
 					<div className={`px-[1vw] py-[1vw] ${selectedMenu == 5 ? fgClr : bgClr} ${selectedMenu == 5 && 'border-l-[0.2vw] border-l-[#ffffff]'} 
 					cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
 					duration-300 font-bold flex gap-[0.5vw]`} onClick={() => {setSelectedMenu(5); setNotificationsExpand(!notificationsExpand)}}>
