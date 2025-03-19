@@ -159,6 +159,7 @@ const getStudentbyId = async (req, res) => {
       name: user.name,
       email: user.email,
       profile: user.profile,
+      imageUrl:user?.imageUrl||'',
     };
     res.status(200).json({
       message: "Success",

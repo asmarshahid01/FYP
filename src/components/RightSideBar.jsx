@@ -104,7 +104,8 @@ export default function RightSideBar() {
                         <div
                             key={account._id}
                             className={`flex items-center gap-[0.5vw] p-[0.5vw] shadow-lg rounded-sm select-none bg-[#3f51b5] transition`}
-                            onClick={()=>navigate(`/profile/${account._id}`)}
+                            onClick={() => navigate(`/profile/${account._id}?role=Student`)
+                              }
                         >
                             <img
                                 src={account?.imageUrl?`http://localhost:4000${account.imageUrl}`:profileImage}
@@ -132,7 +133,43 @@ export default function RightSideBar() {
                     ))
                 ) : (
                     <p className='text-gray-500'>
-                        {searchQuery.length > 0 ? 'No accounts found' : ''}
+                        {(searchQuery.length > 0 && selectedRole!='teachers') ? 'No accounts found' : ''}
+                    </p>
+                )}
+                {selectedRole == 'teachers' && results.length > 0 ? (
+                    results.map((account, index) => (
+                        <div
+                            key={account._id}
+                            className={`flex items-center gap-[0.5vw] p-[0.5vw] shadow-lg rounded-sm select-none bg-[#3f51b5] transition`}
+                            onClick={()=>navigate(`/profile/${account._id}?role=Teacher`)}
+                        >
+                            <img
+                                src={account?.imageUrl?`http://localhost:4000${account.imageUrl}`:profileImage}
+                                className='w-[2.5vw] h-[2.5vw] rounded-full'
+                            />
+                            <p className='font-bold'>{account.name}</p>
+                            <div
+                                className={`ml-auto px-[1vw] py-[0.7vw] rounded-sm ${
+                                    pending.includes(account) ? 'bg-[#f4516c]' : 'bg-[#4e5fbb]'
+                                } transition ${
+                                    pending.includes(account) && 'hover:bg-[#F33F5D]'
+                                } cursor-pointer`}
+                                onClick={() => {
+                                    if (!pending.includes(account))
+                                        setPending((prevItems) => [...prevItems, account]);
+                                    else
+                                        setPending((prevItems) =>
+                                            prevItems.filter((item) => item !== account)
+                                        );
+                                }}
+                            >
+                                {pending.includes(account) ? 'Cancel' : 'Send Request'}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className='text-gray-500'>
+                        {searchQuery.length > 0 && selectedRole!="students" ? 'No accounts found' : ''}
                     </p>
                 )}
             </div>

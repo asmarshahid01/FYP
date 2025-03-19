@@ -1,7 +1,13 @@
 import { React, useState } from 'react';
 import profilePic from '../assets/profile.jpg';
 
-export default function ProfileBar({ user }) {
+export default function ProfileBar({ user,role }) {
+	const loggedUser=JSON.parse(localStorage.getItem("userdetails"));
+	console.log("CHECK->");
+	console.log(user);
+	console.log(loggedUser);
+	console.log(user.email!==loggedUser.email);
+	console.log("CHECKEND");
 	const profileId = 2;
 	const members = [];
 	const supervisor = '';
@@ -13,7 +19,7 @@ export default function ProfileBar({ user }) {
 		<div className='h-full w-1/5 z-0 bg-[#f2f3f8] absolute top-0 left-0 left-1/7 border-r-[0.1vw] border-[#D3D7EE] flex items-center justify-center p-[2vw]'>
 			<div className='h-fit flex flex-col items-center justify-center gap-[2vh] min-w-full'>
 				<img
-					src={profilePic}
+					src={user?.imageUrl?`http://localhost:4000${user.imageUrl}`:profilePic}
 					className='relative w-[8vw] h-[8vw] rounded-full shadow-lg'
 				/>
 				<div className='flex flex-col items-center text-[#666666]'>
@@ -21,7 +27,7 @@ export default function ProfileBar({ user }) {
 						{user.name ? user.name : "N/A"}
 					</p>
 					<p className='text-[0.7vw] text-[#aaaaaa] select-none p-0 m-0'>
-						{profileId == 1 ? 'Teacher' : profileId == 2 ? 'Student' : "N/A"}
+						{role == 'Teacher' ? 'Teacher' : role == 'Student' ? 'Student' : "N/A"}
 					</p>
 				</div>
 				<div className='flex gap-[0.5vw] items-center mt-[1vh] self-start'>
@@ -37,7 +43,7 @@ export default function ProfileBar({ user }) {
 					<p className='text-[#666666] font-bold text-[1vw]'>About:</p>
 					<p className='text-[#888888] text-[0.9vw]'>{user.profile ? user.profile : "N/A"}</p>
 				</div>
-				{profileId == 2 && (
+				{role == 'Student' && (
 					<>
 						<div className='flex flex-col gap-[0.5vw] w-full'>
 							<p className='text-[#666666] font-bold text-[1vw]'>
@@ -60,15 +66,15 @@ export default function ProfileBar({ user }) {
 						</div>
 					</>
 				)}
-				{profileId == 1 && (
+				{role == 'Teacher' && (
 					<div className='flex flex-col gap-[0.5vw] w-full'>
 						<p className='text-[#666666] font-bold text-[1vw]'>No. of Slots:</p>
 						<p className='text-[#888888] text-[0.9vw]'>
-							{availableSlots} of {totalSlots} slots available
+							{user.fypCount} of {user.fypCount} slots available
 						</p>
 					</div>
 				)}
-				<div className='flex flex-col gap-[0.5vw] w-full mt-[5vh]'>
+				{user.id!==loggedUser.id && (<div className='flex flex-col gap-[0.5vw] w-full mt-[5vh]'>
 					<input
 						type='text'
 						value={requestMsg}
@@ -82,7 +88,7 @@ export default function ProfileBar({ user }) {
 					>
 						Request
 					</div>
-				</div>
+				</div>)}
 			</div>
 		</div>
 	);

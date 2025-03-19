@@ -31,6 +31,7 @@ const HomePage = () => {
 	const [selectedOption, setSelectedOption] = useState('All');
 	const [isOpen, setIsOpen] = useState(false);
 	const [requestMsg, setRequestMsg] = useState('');
+	const [trigger,setTrigger]=useState(true);
 	const dropdownRef = useRef(null);
 
 
@@ -223,12 +224,12 @@ const HomePage = () => {
 								key={post._id}
 								className='mb-[4vh] w-full text-[#333333] flex-1 shadow-lg'
 								//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-								onClick={() => navigate(`/profile/${post.author?._id}`)}
+								onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel}`)}
 							>
 								<div className='flex items-center justify-between select-none text-[#333333]'>
 									<div className='flex items-center gap-[1vw]'>
 										<img
-											src={post.author?.pic?.url || profileImage}
+											src={post.author?.imageUrl?`http://localhost:4000${post.author.imageUrl}`:profileImage || profileImage}
 											className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
 											alt='profile'
 										/>
