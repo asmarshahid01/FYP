@@ -15,6 +15,7 @@ import StudentPage from './components/StudentPage';
 import TeacherPage from './components/TeacherPage';
 import SupervisorHomePage from './components/SupervisorHomePage';
 import FypGroupDetails from './components/FypGroupDetails';
+import SupervisorLogin from './components/SupervisorLogin';
 
 // function App() {
 // 	return (
@@ -43,7 +44,7 @@ function App() {
 					path='/profile/:userId'
 					element={<ProtectedRoute element={<StudentPage />} />}
 				/>
-				<Route path='/login' element={<LoginPage />} />
+				<Route path='/login' element={<SupervisorLogin />} />
 			</Routes>
 		</Router>
 	);
