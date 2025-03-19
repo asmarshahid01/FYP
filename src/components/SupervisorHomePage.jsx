@@ -57,7 +57,7 @@ const SupervisorHomePage = () => {
 			const response = await axios.post(
 				'http://localhost:4000/api/post',
 				{
-					authorModel: localStorage.getItem('usertype'),
+					authorModel: localStorage.getItem('usertype')==="Teacher"?"Supervisor":localStorage.getItem('usertype'),
 					content,
 				},
 				{
@@ -221,12 +221,12 @@ const SupervisorHomePage = () => {
 								key={post._id}
 								className='mb-[4vh] w-full text-[#333333] flex-1 shadow-lg'
 								//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-								onClick={() => navigate(`/profile/${post.author?._id}`)}
+								onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel==="Supervisor"?"Teacher":post.authorModel}`)}
 							>
 								<div className='flex items-center justify-between select-none text-[#333333]'>
 									<div className='flex items-center gap-[1vw]'>
 										<img
-											src={post.author?.pic?.url || profileImage}
+											src={post.author?.imageUrl?`http://localhost:4000${post.author.imageUrl}`:profileImage || profileImage}
 											className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
 											alt='profile'
 										/>

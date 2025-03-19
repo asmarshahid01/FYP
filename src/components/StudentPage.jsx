@@ -11,10 +11,11 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import RightSideBar from './RightSideBar';
 
 const StudentPage = () => {
-	const [trigger,setTrigger]=useState(true);
+	
 	const location=useLocation();
 	const { userId } = useParams();
 	const token = localStorage.getItem('token');
+	const userType=localStorage.getItem('usertype');
 	const bgClr = 'bg-[#f2f3f8]';
 	const [requestMsg, setRequestMsg] = useState('');
 	const queryParams=new URLSearchParams(location.search);
@@ -185,7 +186,7 @@ const StudentPage = () => {
 				</div>
 			</div>
 
-			<RightSideBar></RightSideBar>
+			{userType!=='Teacher' && <RightSideBar></RightSideBar>}
 		</div>
 	);
 };

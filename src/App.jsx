@@ -44,7 +44,12 @@ function App() {
 					path='/profile/:userId'
 					element={<ProtectedRoute element={<StudentPage />} />}
 				/>
-				<Route path='/login' element={<SupervisorLogin />} />
+				<Route
+					path='/supervisorhome'
+					element={<ProtectedRoute element={<SupervisorHomePage />} />}
+				/>
+				<Route path='/supervisorlogin' element={<SupervisorLogin />} />
+				<Route path='/studentlogin' element={<LoginPage />} />
 			</Routes>
 		</Router>
 	);

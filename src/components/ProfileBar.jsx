@@ -3,11 +3,7 @@ import profilePic from '../assets/profile.jpg';
 
 export default function ProfileBar({ user,role }) {
 	const loggedUser=JSON.parse(localStorage.getItem("userdetails"));
-	console.log("CHECK->");
-	console.log(user);
-	console.log(loggedUser);
-	console.log(user.email!==loggedUser.email);
-	console.log("CHECKEND");
+	const userType=localStorage.getItem('usertype');
 	const profileId = 2;
 	const members = [];
 	const supervisor = '';
@@ -74,7 +70,7 @@ export default function ProfileBar({ user,role }) {
 						</p>
 					</div>
 				)}
-				{user.id!==loggedUser.id && (<div className='flex flex-col gap-[0.5vw] w-full mt-[5vh]'>
+				{user.id!==loggedUser.id && userType!=='Teacher' && (<div className='flex flex-col gap-[0.5vw] w-full mt-[5vh]'>
 					<input
 						type='text'
 						value={requestMsg}

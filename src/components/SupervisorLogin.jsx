@@ -6,16 +6,16 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function SupervisorLogin() {
-	const [username, setUsername] = useState('');
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const loginData = { username, password };
+		const loginData = { email, password };
 		try {
 			const response = await axios.post(
-				'http://localhost:4000/api/student/login',
+				'http://localhost:4000/api/supervisor/login',
 				loginData
 			);
 			const { token, usertype, userdetails } = response.data;
@@ -29,7 +29,7 @@ export default function SupervisorLogin() {
 			if (userdetails) {
 				localStorage.setItem('userdetails', JSON.stringify(userdetails));
 			}
-			navigate('/home');
+			navigate('/supervisorhome');
 			console.log('User signed up successfully:', response.data);
 		} catch (error) {
 			console.error('Error logging in', error);
@@ -47,8 +47,8 @@ export default function SupervisorLogin() {
 					<input
 						type='text'
 						placeholder='zeeshan.alikhan'
-						value={username}
-						onChange={(e) => setUsername(e.target.value)}
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						className={`rounded-sm pl-[1.5vw] pr-[0.8vw] py-[0.5vw] bg-[#282e3b] text-white focus:outline-none text-[0.9vw]`}
 					/>
 				</div>
@@ -57,7 +57,7 @@ export default function SupervisorLogin() {
 					<input
 						type='password'
 						placeholder='password'
-						username={password}
+						username={email}
 						onChange={(e) => setPassword(e.target.value)}
 						className={`pl-[1.5vw] pr-[0.8vw] py-[0.5vw] text-white focus:outline-none text-[0.9vw]`}
 					/>

@@ -224,7 +224,7 @@ const HomePage = () => {
 								key={post._id}
 								className='mb-[4vh] w-full text-[#333333] flex-1 shadow-lg'
 								//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-								onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel}`)}
+								onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel==="Supervisor"?"Teacher":post.authorModel}`)}
 							>
 								<div className='flex items-center justify-between select-none text-[#333333]'>
 									<div className='flex items-center gap-[1vw]'>
