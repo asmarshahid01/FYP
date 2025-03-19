@@ -61,7 +61,7 @@ const FypGroupDetails = () => {
       </div>
 
 		{/* Received Requests */}
-        <h2 className="text-xl font-bold mt-[5vh] mb-[1vh] text-[#4e5fbb]">Received Requests</h2>
+        <h2 className="text-[1.5vw] font-bold mt-[5vh] mb-[1vh] text-[#4e5fbb]">Received Requests</h2>
         <div className="overflow-x-auto w-3/4">
           <table className="min-w-full table-auto border-collapse select-none rounded-sm shadow-lg">
               <thead>
@@ -87,7 +87,6 @@ const FypGroupDetails = () => {
                         className={`inline-block bg-[#3f51b5] font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#4e5fbb] text-white transition`}
                         onClick={() => {
                           setReceivedRequests((prevItems) => prevItems.filter((item) => item !== user));
-						  setGroupMembers((prevItems) => [...prevItems, {name: user.name, admin: false}])
                         }}>
                         Accept
                       </div>
@@ -99,17 +98,25 @@ const FypGroupDetails = () => {
         </div>
 
         {/* Groups */}
-        <h2 className="text-[1vw] font-bold mt-[5vh] mb-[1vh] text-[#4e5fbb]">Groups</h2>
+        <h2 className="text-[1.5vw] font-bold mt-[5vh] mb-[1vh] text-[#4e5fbb]">Groups</h2>
         <div className="overflow-x-auto w-3/4">
         {groupDetails.length > 0 && groupDetails.map((grp, index) => (
           <div key={index}>
-            <p className=" text-[#777777] text-[0.8vw]"><span className="font-bold text-[#3f51b5]">Project Type: </span>{grp.projectType}</p>
-            <p className=" text-[#777777] text-[0.8vw]"><span className="font-bold text-[#3f51b5]">Project Summary: </span>{grp.projectSummary}</p>
+            <div className="flex justify-between gap-[1vw]">
+              <div>
+                <p className=" text-[#777777] text-[0.8vw]"><span className="font-bold text-[#3f51b5]">Project Type: </span>{grp.projectType}</p>
+                <p className=" text-[#777777] text-[0.8vw]"><span className="font-bold text-[#3f51b5]">Project Summary: </span>{grp.projectSummary}</p>
+              </div>
+              <div className={`inline-block bg-[#3f51b5] max-h-[2.5vw] flex items-center justify-center font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#4e5fbb] text-white transition`}>
+                Message
+              </div>
+            </div>
             <table className="min-w-full table-auto border-collapse select-none rounded-sm shadow-lg mt-[1vh]">
               <thead>
                   <tr className={`bg-[#3f51b5] text-white`}>
                     <th className="px-[1vw] py-[0.7vw] text-left">Student</th>
                     <th className="px-[1vw] py-[0.7vw] text-left">Roll No</th>
+                    <th className="px-[1vw] py-[0.7vw] text-left">Email</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -120,6 +127,10 @@ const FypGroupDetails = () => {
                         <p className="text-[#4e5fbb]">{member.name}</p>
                       </td>
                       <td className="text-[#3f51b5] pl-[0.4vw] px-[1vw] py-[0.7vw] font-bold">{member.rollNo}</td>
+                      <td className="text-[#3f51b5] pl-[0.4vw] px-[1vw] py-[0.7vw] font-bold">
+                        <a href={`mailto:${member.rollNo.charAt(2).toLowerCase() + member.rollNo.substring(0, 2) + member.rollNo.substring(4, 8) + "@lhr.nu.edu.pk"}`}>
+                          {member.rollNo.charAt(2).toLowerCase()}{member.rollNo.substring(0, 2)}{member.rollNo.substring(4, 8)}@lhr.nu.edu.pk</a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
