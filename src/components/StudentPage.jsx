@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../tailwind.css';
 import LeftSideBar from './LeftSideBar';
@@ -11,10 +11,16 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import RightSideBar from './RightSideBar';
 
 const StudentPage = () => {
+	
+	const location=useLocation();
 	const { userId } = useParams();
 	const token = localStorage.getItem('token');
+	const userType=localStorage.getItem('usertype');
 	const bgClr = 'bg-[#f2f3f8]';
 	const [requestMsg, setRequestMsg] = useState('');
+	const queryParams=new URLSearchParams(location.search);
+	const role=queryParams.get('role');
+	const navigate=useNavigate();
 
 	const formatDate = (timestamp) => {
 		return format(new Date(timestamp), 'MMM d, yyyy hh:mm a');
@@ -39,6 +45,7 @@ const StudentPage = () => {
 
 	useEffect(() => {
 		const fetchUserData = async () => {
+			if(role==="Student"){
 			try {
 				const result = await axios.get(
 					`http://localhost:4000/api/student/${userId}`
@@ -53,9 +60,31 @@ const StudentPage = () => {
 			} finally {
 				setLoading(false);
 			}
+		}
+		else if(role==="Teacher"){
+			try {
+				const result = await axios.get(
+					`http://localhost:4000/api/supervisor/${userId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+				if (result.data) {
+					console.log(result.data);
+					setUserDetails(result.data.userDetails);
+				}
+			} catch (err) {
+				console.log(err);
+				setError('Failed to fetch user data');
+			} finally {
+				setLoading(false);
+			}
+		}
 		};
 		fetchUserData();
-	}, []);
+	}, [userId]);
 
 	// if (loading) return <p>Loading...</p>;
 	// if (error) return <p>{error}</p>;
@@ -94,7 +123,7 @@ const StudentPage = () => {
 	return (
 		<div className='flex absolute h-full w-full top-0 left-0 bg-darkgray-100'>
 			<LeftSideBar></LeftSideBar>
-			<ProfileBar user={userDetails}></ProfileBar>
+			<ProfileBar user={userDetails} role={role}></ProfileBar>
 
 			{/* Main Feed */}
 			<div className={`flex-1 p-[0.5vw] ml-[3.3vw] ${bgClr}`}>
@@ -117,12 +146,12 @@ const StudentPage = () => {
 									key={post._id}
 									className='mb-[4vh] w-full text-[#333333] flex-1'
 									//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-									onClick={() => navigate(`/profile/${post.author?._id}`)}
+									onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel}`)}
 								>
 									<div className='flex items-center justify-between select-none text-[#333333]'>
 										<div className='flex items-center gap-[1vw]'>
 											<img
-												src={post.author?.pic?.url || profileImage}
+												src={post.author?.imageUrl?`http://localhost:4000${post.author.imageUrl}`:profileImage || profileImage}
 												className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
 												alt='profile'
 											/>
@@ -157,7 +186,7 @@ const StudentPage = () => {
 				</div>
 			</div>
 
-			<RightSideBar></RightSideBar>
+			{userType!=='Teacher' && <RightSideBar></RightSideBar>}
 		</div>
 	);
 };

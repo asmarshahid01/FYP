@@ -1,6 +1,7 @@
 import express from 'express';
 import connect from './utils/dbConnect.js';
 import studentRoutes from './routes/studentRoutes.js';
+import supervisorRoutes from './routes/supervisorRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
@@ -26,6 +27,7 @@ app.use('/api/post', postRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/request', requestRoutes);
 app.use('/api/group', groupRoutes);
+app.use('/api/supervisor',supervisorRoutes);
 
 app.listen(port, () => {
 	console.log('SERVER IS ON!!');

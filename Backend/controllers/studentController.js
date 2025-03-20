@@ -150,25 +150,26 @@ const getInfo = async (req, res) => {
 };
 
 const getStudentbyId = async (req, res) => {
-	console.log('Get Student by ID');
-	try {
-		const user = await Student.findById(req.params.id);
-		if (!user) {
-			return res.status(404).json({ message: 'Student not found' });
-		}
-		const userDetails = {
-			id: req.params.id,
-			name: user.name,
-			email: user.email,
-			profile: user.profile,
-		};
-		res.status(200).json({
-			message: 'Success',
-			userDetails,
-		});
-	} catch (error) {
-		res.status(500).json({ message: 'Internal server error' });
-	}
+  console.log("Get Student by ID");
+  try {
+    const user = await Student.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    const userDetails = {
+      id: req.params.id,
+      name: user.name,
+      email: user.email,
+      profile: user.profile,
+      imageUrl:user?.imageUrl||'',
+    };
+    res.status(200).json({
+      message: "Success",
+      userDetails,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export { login, getInfo, updateBio, getStudentbyId, upload };

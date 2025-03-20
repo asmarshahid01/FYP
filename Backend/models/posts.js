@@ -10,7 +10,7 @@ const postSchema = new mongoose.Schema(
 		authorModel: {
 			type: String,
 			required: true,
-			enum: ['Student', 'Teacher'],
+			enum: ['Student', 'Teacher','Supervisor'],
 		},
 		content: {
 			type: String,
