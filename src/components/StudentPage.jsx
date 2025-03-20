@@ -64,7 +64,7 @@ const StudentPage = () => {
 		if (!hasMore) return;
 		try {
 			const res = await axios.get(
-				`http://localhost:4000/api/post/67d29103d3461157854e1c6d?page=${page}`,
+				`http://localhost:4000/api/post/${userId}?page=${page}`,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
