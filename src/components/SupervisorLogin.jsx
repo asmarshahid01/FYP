@@ -46,7 +46,7 @@ export default function SupervisorLogin() {
 					<User className='relative left-[0.7vw] top-[0.7vw] text-[#fbfbfb]' />
 					<input
 						type='text'
-						placeholder='zeeshan.alikhan'
+						placeholder='email'
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						className={`rounded-sm pl-[1.5vw] pr-[0.8vw] py-[0.5vw] bg-[#282e3b] text-white focus:outline-none text-[0.9vw]`}

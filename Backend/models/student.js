@@ -14,8 +14,8 @@ const studentSchema = new mongoose.Schema({
 		required: true,
 		unique: true,
 	},
-	imageUrl:{
-		type:String,
+	imageUrl: {
+		type: String,
 	},
 	profile: {
 		type: String,
@@ -28,6 +28,10 @@ const studentSchema = new mongoose.Schema({
 	},
 	role: {
 		type: Boolean,
+	},
+	groupId: {
+		type: Schema.Types.ObjectId,
+		ref: 'Fypgroup',
 	},
 	requests: [
 		{

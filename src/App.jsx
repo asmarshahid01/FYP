@@ -30,10 +30,17 @@ function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path='/' element={<ProtectedRoute element={<SupervisorHomePage />} />} />
+				<Route
+					path='/'
+					element={<ProtectedRoute element={<SupervisorHomePage />} />}
+				/>
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
 					path='/group'
+					element={<ProtectedRoute element={<FYPGroupPage />} />}
+				/>
+				<Route
+					path='/supervisorgroup'
 					element={<ProtectedRoute element={<FypGroupDetails />} />}
 				/>
 				<Route
@@ -49,7 +56,7 @@ function App() {
 					element={<ProtectedRoute element={<SupervisorHomePage />} />}
 				/>
 				<Route path='/supervisorlogin' element={<SupervisorLogin />} />
-				<Route path='/studentlogin' element={<LoginPage />} />
+				<Route path='/login' element={<LoginPage />} />
 			</Routes>
 		</Router>
 	);

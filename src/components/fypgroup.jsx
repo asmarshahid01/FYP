@@ -11,6 +11,7 @@ const FYPGroupPage = () => {
 	const [isChanged, setIsChanged] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const options = ['Development', 'R&D'];
+	console.log(JSON.parse(localStorage.getItem('userdetails')));
 	const userid = JSON.parse(localStorage.getItem('userdetails')).id;
 
 	const [pending, setPending] = useState([]);

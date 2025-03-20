@@ -11,16 +11,15 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import RightSideBar from './RightSideBar';
 
 const StudentPage = () => {
-	
-	const location=useLocation();
+	const location = useLocation();
 	const { userId } = useParams();
 	const token = localStorage.getItem('token');
-	const userType=localStorage.getItem('usertype');
+	const userType = localStorage.getItem('usertype');
 	const bgClr = 'bg-[#f2f3f8]';
 	const [requestMsg, setRequestMsg] = useState('');
-	const queryParams=new URLSearchParams(location.search);
-	const role=queryParams.get('role');
-	const navigate=useNavigate();
+	const queryParams = new URLSearchParams(location.search);
+	const role = queryParams.get('role');
+	const navigate = useNavigate();
 
 	const formatDate = (timestamp) => {
 		return format(new Date(timestamp), 'MMM d, yyyy hh:mm a');
@@ -45,43 +44,42 @@ const StudentPage = () => {
 
 	useEffect(() => {
 		const fetchUserData = async () => {
-			if(role==="Student"){
-			try {
-				const result = await axios.get(
-					`http://localhost:4000/api/student/${userId}`
-				);
-				if (result.data) {
-					console.log(result.data);
-					setUserDetails(result.data.userDetails);
-				}
-			} catch (err) {
-				console.log(err);
-				setError('Failed to fetch user data');
-			} finally {
-				setLoading(false);
-			}
-		}
-		else if(role==="Teacher"){
-			try {
-				const result = await axios.get(
-					`http://localhost:4000/api/supervisor/${userId}`,
-					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
+			if (role === 'Student') {
+				try {
+					const result = await axios.get(
+						`http://localhost:4000/api/student/${userId}`
+					);
+					if (result.data) {
+						console.log(result.data);
+						setUserDetails(result.data.userDetails);
 					}
-				);
-				if (result.data) {
-					console.log(result.data);
-					setUserDetails(result.data.userDetails);
+				} catch (err) {
+					console.log(err);
+					setError('Failed to fetch user data');
+				} finally {
+					setLoading(false);
 				}
-			} catch (err) {
-				console.log(err);
-				setError('Failed to fetch user data');
-			} finally {
-				setLoading(false);
+			} else if (role === 'Teacher') {
+				try {
+					const result = await axios.get(
+						`http://localhost:4000/api/supervisor/${userId}`,
+						{
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					);
+					if (result.data) {
+						console.log(result.data);
+						setUserDetails(result.data.userDetails);
+					}
+				} catch (err) {
+					console.log(err);
+					setError('Failed to fetch user data');
+				} finally {
+					setLoading(false);
+				}
 			}
-		}
 		};
 		fetchUserData();
 	}, [userId]);
@@ -146,12 +144,20 @@ const StudentPage = () => {
 									key={post._id}
 									className='mb-[4vh] w-full text-[#333333] flex-1'
 									//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-									onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel}`)}
+									onClick={() =>
+										navigate(
+											`/profile/${post.author?._id}?role=${post.authorModel}`
+										)
+									}
 								>
 									<div className='flex items-center justify-between select-none text-[#333333]'>
 										<div className='flex items-center gap-[1vw]'>
 											<img
-												src={post.author?.imageUrl?`http://localhost:4000${post.author.imageUrl}`:profileImage || profileImage}
+												src={
+													post.author?.imageUrl
+														? `http://localhost:4000${post.author.imageUrl}`
+														: profileImage || profileImage
+												}
 												className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
 												alt='profile'
 											/>
@@ -164,21 +170,6 @@ const StudentPage = () => {
 										</div>
 									</div>
 									<p className='mt-[0.5vw]'>{post.content}</p>
-									<div className='flex gap-[0.5vw] w-full mt-[2vh]'>
-										<input
-											type='text'
-											value={requestMsg}
-											onChange={(e) => setRequestMsg(e.target.value)}
-											placeholder='Request Message'
-											className='text-[#888888] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none flex-[8]'
-										/>
-										<div
-											className='h-[2.5vw] w-full bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
-                                                    rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2]'
-										>
-											Request
-										</div>
-									</div>
 								</Card>
 							))}
 						</InfiniteScroll>
@@ -186,7 +177,7 @@ const StudentPage = () => {
 				</div>
 			</div>
 
-			{userType!=='Teacher' && <RightSideBar></RightSideBar>}
+			{userType !== 'Teacher' && <RightSideBar></RightSideBar>}
 		</div>
 	);
 };

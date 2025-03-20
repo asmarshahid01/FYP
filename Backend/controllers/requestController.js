@@ -8,7 +8,6 @@ const createRequest = async (req, res) => {
 	try {
 		const { message, receiverId, receiverModel } = req.body;
 		const sender = req.user.id;
-
 		const request = new Request({
 			message,
 			sender,
@@ -130,6 +129,8 @@ const acceptRequest = async (req, res) => {
 				});
 				console.log('Group created: ', group);
 				await group.save();
+				sender.groupId = group._id;
+				receiver.groupId = group._id;
 				await Request.deleteMany({ sender: sender._id });
 				await Request.deleteMany({
 					receiver: receiver._id,

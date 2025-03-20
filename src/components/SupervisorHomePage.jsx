@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	useCallback,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Search, ChevronDown } from 'lucide-react';
@@ -31,8 +37,6 @@ const SupervisorHomePage = () => {
 	const [requestMsg, setRequestMsg] = useState('');
 	const dropdownRef = useRef(null);
 
-
-
 	const [pending, setPending] = useState([]);
 	const [accounts] = useState([
 		'John Doe',
@@ -49,7 +53,6 @@ const SupervisorHomePage = () => {
 	const [hasMore, setHasMore] = useState(true);
 	const initialRender = useRef(true);
 
-
 	const handleCreatePost = async () => {
 		if (!content.trim()) return alert('Post content cannot be empty.');
 
@@ -57,7 +60,10 @@ const SupervisorHomePage = () => {
 			const response = await axios.post(
 				'http://localhost:4000/api/post',
 				{
-					authorModel: localStorage.getItem('usertype')==="Teacher"?"Supervisor":localStorage.getItem('usertype'),
+					authorModel:
+						localStorage.getItem('usertype') === 'Teacher'
+							? 'Supervisor'
+							: localStorage.getItem('usertype'),
 					content,
 				},
 				{
@@ -72,7 +78,6 @@ const SupervisorHomePage = () => {
 			console.log(error);
 		}
 	};
-
 
 	// Filter accounts based on search query and selected role
 	// const filteredAccounts = useMemo(() => {
@@ -221,12 +226,24 @@ const SupervisorHomePage = () => {
 								key={post._id}
 								className='mb-[4vh] w-full text-[#333333] flex-1 shadow-lg'
 								//onClick={() => setRightSideBarExpand(!rightSideBarExpand)}
-								onClick={() => navigate(`/profile/${post.author?._id}?role=${post.authorModel==="Supervisor"?"Teacher":post.authorModel}`)}
+								onClick={() =>
+									navigate(
+										`/profile/${post.author?._id}?role=${
+											post.authorModel === 'Supervisor'
+												? 'Teacher'
+												: post.authorModel
+										}`
+									)
+								}
 							>
 								<div className='flex items-center justify-between select-none text-[#333333]'>
 									<div className='flex items-center gap-[1vw]'>
 										<img
-											src={post.author?.imageUrl?`http://localhost:4000${post.author.imageUrl}`:profileImage || profileImage}
+											src={
+												post.author?.imageUrl
+													? `http://localhost:4000${post.author.imageUrl}`
+													: profileImage || profileImage
+											}
 											className='w-[3vw] h-[3vw] rounded-full flex items-center justify-center font-bold'
 											alt='profile'
 										/>
@@ -239,28 +256,15 @@ const SupervisorHomePage = () => {
 									</div>
 								</div>
 								<p className='mt-[0.5vw]'>{post.content}</p>
-								<div className='flex gap-[0.5vw] w-full mt-[2vh]'>
-									<input
-										type='text'
-										value={requestMsg}
-										onChange={(e) => setRequestMsg(e.target.value)}
-										placeholder='Request Message'
-										className='text-[#888888] border border-[#cccccc] rounded-sm p-[0.5vw] text-[0.8vw] focus:outline-none flex-[8]'
-									/>
-									<div
-										className='h-[2.5vw] w-full bg-[#3f51b5] transition hover:bg-[#4e5fbb] flex items-center justify-center font-bold
-								rounded-sm cursor-pointer shadow-lg hover:shadow-[#4e5fbb] duration-500 text-[#eeeeee] flex-[2]'
-									>
-										Request
-									</div>
-								</div>
 							</Card>
 						))}
 					</InfiniteScroll>
 				</div>
 			</div>
 
-			<div className={`w-1/5 p-[1vw] ${bgClr} border-l-[0.1vw] border-[#D3D7EE] text-white`}></div>
+			<div
+				className={`w-1/5 p-[1vw] ${bgClr} border-l-[0.1vw] border-[#D3D7EE] text-white`}
+			></div>
 		</div>
 	);
 };

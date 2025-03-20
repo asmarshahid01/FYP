@@ -52,6 +52,10 @@ const leaveGroup = async (req, res) => {
 		const student = await Student.findById(studentId);
 		student.role = true;
 		await student.save();
+		if (group.studentsId.length === 1) {
+			await group.deleteOne();
+			return res.status(200).json({ message: 'Left group successfully' });
+		}
 		await group.save();
 		res.status(200).json({ message: 'Left group successfully' });
 	} catch (error) {
