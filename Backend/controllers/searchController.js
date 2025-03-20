@@ -28,7 +28,7 @@ const search = async (req, res) => {
         let results = [];
         if (type === "students") {
             results = await Student.find({ name: { $regex: query, $options: "i" } });
-        } else if (type === "supervisor") {
+        } else if (type === "teachers") {
             results = await Supervisor.find({ name: { $regex: query, $options: "i" } });
         } else {
             return res.status(400).json({ message: "Invalid search type" });

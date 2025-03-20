@@ -27,6 +27,7 @@ export default function LoginPage() {
 				localStorage.setItem('usertype', usertype);
 			}
 			if (userdetails) {
+				console.log(userdetails)
 				localStorage.setItem('userdetails', JSON.stringify(userdetails));
 			}
 			navigate('/home');

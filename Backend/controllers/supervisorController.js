@@ -1,6 +1,7 @@
+import Supervisor from "../models/supervisor.js";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import Student from "../models/student.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -8,10 +9,12 @@ import { fileURLToPath } from "url";
 
 const { JWT_SECRET } = process.env;
 
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const uploadDir = "./uploads/students/";
+const uploadDir = "./uploads/supervisor/";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -33,7 +36,7 @@ const updateBio = async (req, res) => {
     res.status(400).json({ message: "Unauthorized User found", err });
   }
 
-  const user = await Student.findById(userID);
+  const user = await Supervisor.findById(userID);
   if (!user) {
     res.status(400).json({ message: "No Such User exists in the system", err });
   }
@@ -41,7 +44,7 @@ const updateBio = async (req, res) => {
   user.profile = req.body.bio;
 
   if (req.file) {
-    const rollNumber = req.body.rollNumber;
+    const rollNumber = req.body.fileName;
     if (!rollNumber) {
         return res.status(400).json({ message: "Roll number is required" });
     }
@@ -51,7 +54,7 @@ const updateBio = async (req, res) => {
 
 
     // Define the upload directory
-    const uploadDir = path.join(__dirname, '..', 'uploads', 'students');
+    const uploadDir = path.join(__dirname, '..', 'uploads', 'supervisor');
 
     // Ensure the directory exists
     if (!fs.existsSync(uploadDir)) {
@@ -79,21 +82,51 @@ const updateBio = async (req, res) => {
         return res.status(500).json({ message: "Uploaded file not found on server" });
     }
 
-    user.imageUrl = `/uploads/students/${newFileName}`;
+    user.imageUrl = `/uploads/supervisor/${newFileName}`;
 }
   await user.save();
   res.status(200).json({ message: "Updated Successfully", bio: req.body.bio });
 };
+
+const getInfo = async (req, res) => {
+    console.log("TESTING THE APIII");
+    try {
+      const userID = req.user.id;
+      if (!userID) {
+        res.status(400).json({ message: "Unauthorized User found", err });
+      }
+      const user = await Supervisor.findById(userID);
+      if (!user) {
+        res
+          .status(400)
+          .json({ message: "No Such User exists in the system", err });
+      }
+  
+      const userDetails = {
+        name: user.name,
+        email: user.email,
+        profile: user.profile,
+        imageUrl: user?.imageUrl || "",
+      };
+  
+      res.status(200).json({
+        message: "Success",
+        userDetails,
+      });
+    } catch (error) {
+      res.status(400).json({ message: "Network Error ", err });
+    }
+  };
 
 const login = async (req, res) => {
   try {
     console.log(req.body);
     const { email, password } = req.body;
 
-    const user = await Student.findOne({ email });
+    const user = await Supervisor.findOne({ email });
     console.log(user);
     if (!user) {
-      return res.status(400).json({ message: "No student with that email!" });
+      return res.status(400).json({ message: "No teacher with that email!" });
     }
     const isMatched = bcrypt.compareSync(password, user.password);
     if (!isMatched) {
@@ -102,7 +135,7 @@ const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: "8h",
     });
-    const usertype = "Student";
+    const usertype = "Teacher";
     const userdetails = {
       id: user._id,
       name: user.name,
@@ -118,48 +151,20 @@ const login = async (req, res) => {
   }
 };
 
-const getInfo = async (req, res) => {
+const getSupervisorById = async (req, res) => {
+  console.log("Get Supervisor by ID");
   try {
-    const userID = req.user.id;
-    if (!userID) {
-      res.status(400).json({ message: "Unauthorized User found", err });
-    }
-    const user = await Student.findById(userID);
+    const user = await Supervisor.findById(req.params.id);
     if (!user) {
-      res
-        .status(400)
-        .json({ message: "No Such User exists in the system", err });
-    }
-
-    const userDetails = {
-      name: user.name,
-      email: user.email,
-      profile: user.profile,
-      imageUrl: user?.imageUrl || "",
-    };
-
-    res.status(200).json({
-      message: "Success",
-      userDetails,
-    });
-  } catch (error) {
-    res.status(400).json({ message: "Network Error ", err });
-  }
-};
-
-const getStudentbyId = async (req, res) => {
-  console.log("Get Student by ID");
-  try {
-    const user = await Student.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: "Supervisor not found" });
     }
     const userDetails = {
       id: req.params.id,
       name: user.name,
       email: user.email,
       profile: user.profile,
-      imageUrl:user?.imageUrl||'',
+      fypCount: user.fypCount,
+      imageUrl: user?.imageUrl || "",
     };
     res.status(200).json({
       message: "Success",
@@ -170,7 +175,4 @@ const getStudentbyId = async (req, res) => {
   }
 };
 
-
-
-
-export { login, getInfo, updateBio, getStudentbyId, upload };
+export { getSupervisorById, login,upload,updateBio,getInfo };

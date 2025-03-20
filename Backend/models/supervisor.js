@@ -12,6 +12,10 @@ const supervisorSchema = new mongoose.Schema({
   profile: {
     type: String,
   },
+  imageUrl:{
+    type:String,
+    default:"",
+  },
   email: {
     type: String,
     required: true,
