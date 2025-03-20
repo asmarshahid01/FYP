@@ -1,9 +1,6 @@
-import client from "../utils/redistConnect.js";
-import Student from "../models/student.js";
-import Supervisor from "../models/supervisor.js";
-
-
-
+import client from '../utils/redistConnect.js';
+import Student from '../models/student.js';
+import Supervisor from '../models/supervisor.js';
 
 const search = async (req, res) => {
     console.log("Request is recieved");
@@ -52,4 +49,3 @@ const search = async (req, res) => {
 };
 
 export { search };
-
