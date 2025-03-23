@@ -101,6 +101,9 @@ const acceptRequest = async (req, res) => {
 			return res.status(401).json({ message: 'Unauthorized' });
 		}
 
+		if(request.receiverModel==="Student"){
+
+
 		const sender = await Student.findById(request.sender);
 		const receiver = await Student.findById(request.receiver);
 
@@ -109,14 +112,13 @@ const acceptRequest = async (req, res) => {
 		if (!sender || !receiver) {
 			return res.status(404).json({ message: 'User not found' });
 		}
-
-		if (request.receiverModel === 'Student') {
 			sender.role = false;
 			receiver.role = true;
 			const receivergroup = await Fypgroup.findOne({ studentsId: sender._id });
 			if (receivergroup) {
 				if (receivergroup.studentsId.length < 3) {
 					receivergroup.studentsId.push(receiver._id);
+					receiver.groupId=receivergroup._id;
 					await receivergroup.save();
 					await Request.deleteMany({ sender: sender._id });
 				} else {
@@ -136,14 +138,31 @@ const acceptRequest = async (req, res) => {
 					receiver: receiver._id,
 				});
 			}
-		} else {
-			console.log;
+			await receiver.save();
+			await sender.save();
+			await request.deleteOne();
+			res.status(200).json({ message: 'Request accepted successfully' });
+		}
+		else if(request.receiverModel==="Supervisor"){
+			const sender = await Student.findById(request.sender);
+			const receiver = await Supervisor.findById(request.receiver);
+
+			if (!sender || !receiver) {
+				return res.status(404).json({ message: 'User not found' });
+			}
+
+			const studentGroup=await Fypgroup.findById(sender.groupId);
+			console.log(studentGroup);
+			studentGroup.supervisorId=userId;
+			await studentGroup.save();
+			receiver.fypGroups.push(studentGroup._id);
+			receiver.fypCount=receiver.fypCount-1;
+			await receiver.save();
+			await request.deleteOne();
+
 		}
 
-		await receiver.save();
-		await sender.save();
-		await request.deleteOne();
-		res.status(200).json({ message: 'Request accepted successfully' });
+
 	} catch (err) {
 		console.error('Accept Request Error: ', err);
 		res.status(500).json({ message: 'Server error' });

@@ -12,13 +12,13 @@ const notificationSchema = new mongoose.Schema(
     },
     sender: {
       type: Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
+      refPath: "receiverModel",
+      
     },
     receiver: {
       type: Schema.Types.ObjectId,
       refPath: "receiverModel",
-      required: true,
+      
     },
     receiverModel: {
       type: String,

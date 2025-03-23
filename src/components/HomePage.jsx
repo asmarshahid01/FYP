@@ -63,7 +63,10 @@ const HomePage = () => {
 			const response = await axios.post(
 				'http://localhost:4000/api/post',
 				{
-					authorModel: localStorage.getItem('usertype'),
+					authorModel:
+					localStorage.getItem('usertype') === 'Teacher'
+						? 'Supervisor'
+						: localStorage.getItem('usertype'),
 					content,
 				},
 				{

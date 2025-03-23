@@ -1,22 +1,39 @@
-import { React, useState} from 'react';
+import { React, useEffect, useState} from 'react';
 import profilePic from '../assets/profile.jpg';
+import axios from 'axios';
 
 const Notifications = ({notificationsExpand}) => {
 
+
+    const token=localStorage.getItem("token");
+    const userType=localStorage.getItem("usertype");
+    const user=localStorage.getItem("userdetails");
+
     const [selectedType, setSelectedType] = useState("req");
-    const [notifications, setNotifications] = useState([{
-        type: "req",
-        name: "Abdul Wahaab",
-        time: "6:20 PM",
-    }, {
-        type: "req",
-        name: "Fahad Mahmood",
-        time: "6:20 PM",
-    }, {
-        type: "other",
-        name: "Saad Sohail",
-        time: "6:20 PM",
-    }]);
+    const [notifications, setNotifications] = useState([]);
+
+
+    useEffect(()=>{
+        const fetchNotification=async()=>{
+            try {
+                const result = await axios.get('http://localhost:4000/api/notification', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                if(result.status===200){
+                    setNotifications(result.data.data);
+                    console.log(result.data.data);
+                }
+                if(result.status===201){
+                    setNotifications([]);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchNotification();
+    },[])
 
 	return (
 		<div className={`absolute top-0 left-1/7 z-20 h-full bg-[#3f5ab5] transition-all duration-500 flex items-center justify-center
@@ -38,22 +55,22 @@ const Notifications = ({notificationsExpand}) => {
                             </div>
                             <div className='flex flex-col gap-[1vh]'>
                                 {notifications.map((notification, index) => (
-                                    <><>{notification.type == "req" && selectedType == "req" && <div key={index}
+                                    <><>{notification.requestType == "Admin" && <div key={index}
                                     className='bg-[#4e5fbb] p-[0.6vw] transition duration-300 hover:shadow-lg rounded-sm'>
                                         <div className='flex gap-[0.5vw]'>
                                             <img src={profilePic} className='relative w-[2vw] h-[2vw] rounded-full shadow-lg' />
                                             <div className='flex flex-col'>
                                                 <div className='flex gap-[0.3vw]'>
-                                                    <p className='font-bold'>{notification.name}</p>
-                                                    <p>sent you a request</p>
+                                                    <p className='font-bold'>{notification.requestType}</p>
+                                                    <p>{notification.message}</p>
                                                 </div>
-                                                <p className='opacity-50'>{notification.time}</p>
+                                                <p className='opacity-50'>{notification.createdAt}</p>
                                             </div>
                                         </div>
-                                        <div className='flex gap-[0.2vw] mt-[0.5vw]'>
+                                        {/* <div className='flex gap-[0.2vw] mt-[0.5vw]'>
                                             <div className='bg-[#3f51b5] py-[0.5vw] px-[1vw] rounded-sm cursor-pointer'>Accept</div>
                                             <div className='bg-[#3f51b5] py-[0.5vw] px-[1vw] rounded-sm cursor-pointer'>Decline</div>
-                                        </div>
+                                        </div> */}
                                     </div>}</>
                                     <>{notification.type == "other" && selectedType == "other" && <div key={index}
                                     className='bg-[#4e5fbb] p-[0.6vw] transition duration-300 hover:shadow-lg rounded-sm'>

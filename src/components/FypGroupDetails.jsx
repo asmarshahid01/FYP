@@ -8,18 +8,20 @@ import axios from 'axios';
 const FypGroupDetails = () => {
 	const [receivedRequests, setReceivedRequests] = useState([]);
 
-	const [groupDetails, setGroupDetails] = useState([
-		{
-			members: [
-				{ name: 'Abdul Wahaab', rollNo: '21L-5291' },
-				{ name: 'Saad Sohail', rollNo: '21L-5344' },
-				{ name: 'Asmar Shahid', rollNo: '21L-1754' },
-			],
-			projectType: 'Development',
-			projectSummary:
-				'An online portal to manage all FYP related stuff, for students as well as supervisors and co-ordinators',
-		},
-	]);
+	// const [groupDetails, setGroupDetails] = useState([
+	// 	{
+	// 		members: [
+	// 			{ name: 'Abdul Wahaab', rollNo: '21L-5291' },
+	// 			{ name: 'Saad Sohail', rollNo: '21L-5344' },
+	// 			{ name: 'Asmar Shahid', rollNo: '21L-1754' },
+	// 		],
+	// 		projectType: 'Development',
+	// 		projectSummary:
+	// 			'An online portal to manage all FYP related stuff, for students as well as supervisors and co-ordinators',
+	// 	},
+	// ]);
+
+	const [groupDetails,setGroupDetails]=useState([]);
 
 	const bgClr = 'bg-[#f2f3f8]';
 	const fgClr = 'bg-[#3f51b5]';
@@ -42,6 +44,24 @@ const FypGroupDetails = () => {
 		'Nov',
 		'Dec',
 	];
+	useEffect(()=>{
+		async function fetchData() {
+			try {
+				const token=localStorage.getItem("token");
+				const response = await axios.get('http://localhost:4000/api/group/supervisor', {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
+				console.log('Received requests:', response.data.fypGroups);
+				setGroupDetails(response.data.fypGroups);
+			} catch (error) {
+				console.log("SOMETHING WRONG WITH FYP");
+				console.log(error);
+			}
+		}
+		fetchData();
+	},[]);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -63,6 +83,28 @@ const FypGroupDetails = () => {
 		}
 		fetchData();
 	}, []);
+
+
+	const acceptRequest = async (id) => {
+			try {
+				const token = localStorage.getItem('token');
+				const response = await axios.post(
+					`http://localhost:4000/api/request/${id}/accept`,
+					{},
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+				console.log('Request accepted successfully:', response.data);
+			} catch (error) {
+				console.error(
+					'Error accepting request:',
+					error.response?.data?.message || error.message
+				);
+			}
+		};
 
 	return (
 		<div className='flex absolute h-full w-full top-0 left-0 bg-darkgray-100 overflow-hidden'>
@@ -120,11 +162,7 @@ const FypGroupDetails = () => {
 										<td className='px-[1vw] py-[0.7vw]'>
 											<div
 												className={`inline-block bg-[#3f51b5] font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#4e5fbb] text-white transition`}
-												onClick={() => {
-													setReceivedRequests((prevItems) =>
-														prevItems.filter((item) => item !== user)
-													);
-												}}
+												onClick={() => acceptRequest(request._id)}
 											>
 												Accept
 											</div>
@@ -156,13 +194,13 @@ const FypGroupDetails = () => {
 											<span className='font-bold text-[#3f51b5]'>
 												Project Type:{' '}
 											</span>
-											{grp.projectType}
+											{grp.type}
 										</p>
 										<p className=' text-[#777777] text-[0.8vw]'>
 											<span className='font-bold text-[#3f51b5]'>
 												Project Summary:{' '}
 											</span>
-											{grp.projectSummary}
+											{grp.title}
 										</p>
 									</div>
 									<div
@@ -180,7 +218,7 @@ const FypGroupDetails = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{grp.members.map((member, grpIndex) => (
+										{grp.studentsId.map((member, grpIndex) => (
 											<tr
 												key={grpIndex}
 												className={
@@ -189,27 +227,26 @@ const FypGroupDetails = () => {
 											>
 												<td className='px-[1vw] py-[0.7vw] flex items-center gap-[0.5vw] font-bold'>
 													<img
-														src={profileImage}
+														src={
+																										member?.imageUrl
+																											? `http://localhost:4000${member.imageUrl}`
+																											: profileImage || profileImage
+																									}
 														className='w-[2.5vw] h-[2.5vw] rounded-full'
 														alt='Profile'
 													/>
 													<p className='text-[#4e5fbb]'>{member.name}</p>
 												</td>
 												<td className='text-[#3f51b5] pl-[0.4vw] px-[1vw] py-[0.7vw] font-bold'>
-													{member.rollNo}
+													{member.email.substring(0,7)}
 												</td>
 												<td className='text-[#3f51b5] pl-[0.4vw] px-[1vw] py-[0.7vw] font-bold'>
 													<a
 														href={`mailto:${
-															member.rollNo.charAt(2).toLowerCase() +
-															member.rollNo.substring(0, 2) +
-															member.rollNo.substring(4, 8) +
-															'@lhr.nu.edu.pk'
+															member.email
 														}`}
 													>
-														{member.rollNo.charAt(2).toLowerCase()}
-														{member.rollNo.substring(0, 2)}
-														{member.rollNo.substring(4, 8)}@lhr.nu.edu.pk
+														{member.email}
 													</a>
 												</td>
 											</tr>
