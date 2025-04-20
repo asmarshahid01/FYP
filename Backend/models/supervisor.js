@@ -24,6 +24,12 @@ const supervisorSchema = new mongoose.Schema({
   fypCount: {
     type: Number,
   },
+  fypGroups:[
+    {
+      type:Schema.Types.ObjectId,
+      ref:"Fypgroup"
+    }
+  ],
   requests: [
     {
       type: Schema.Types.ObjectId,

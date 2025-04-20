@@ -16,6 +16,8 @@ import TeacherPage from './components/TeacherPage';
 import SupervisorHomePage from './components/SupervisorHomePage';
 import FypGroupDetails from './components/FypGroupDetails';
 import SupervisorLogin from './components/SupervisorLogin';
+import AdminHome from './components/AdminHome';
+import ReportCheckPage from './components/LatexCheck';
 
 // function App() {
 // 	return (
@@ -34,6 +36,15 @@ function App() {
 					path='/'
 					element={<ProtectedRoute element={<SupervisorHomePage />} />}
 				/>
+				<Route
+					path='/admin'
+					element={<AdminHome />}
+				/>
+				<Route
+					path='/coordinator'
+					element={<ReportCheckPage />}
+				/>
+
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
 					path='/group'
