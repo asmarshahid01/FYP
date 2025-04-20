@@ -16,6 +16,7 @@ import TeacherPage from './components/TeacherPage';
 import SupervisorHomePage from './components/SupervisorHomePage';
 import FypGroupDetails from './components/FypGroupDetails';
 import SupervisorLogin from './components/SupervisorLogin';
+import AdminDashboard from './components/AdminDashboard';
 
 // function App() {
 // 	return (
@@ -32,7 +33,7 @@ function App() {
 			<Routes>
 				<Route
 					path='/'
-					element={<ProtectedRoute element={<SupervisorHomePage />} />}
+					element={<ProtectedRoute element={<AdminDashboard />} />}
 				/>
 				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
 				<Route
