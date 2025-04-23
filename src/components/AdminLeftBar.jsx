@@ -45,7 +45,7 @@ export default function AdminLeftBar() {
 			    <div className={`px-[1vw] py-[1vw]  cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
                 duration-300 font-bold flex gap-[0.5vw]`}
 				onClick={() => {}}>
-					<User /> Students
+					<User /> Accounts
 				</div>
 				</nav>
 

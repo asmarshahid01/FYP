@@ -281,9 +281,8 @@ export default function AdminDashboard() {
 
         {/*Right bar*/}
         {/* Right bar */}
-        {expandedRow && (
         <div className="h-full w-2/7 absolute left-5/7 shadow-lg p-4 overflow-y-auto flex flex-col items-center justify-center">
-            <h2 className="font-bold text-[#3f51b5] mb-[1vw] w-full text-center text-[2vw]">F24-89</h2>
+            {expandedRow ? ( <> <h2 className="font-bold text-[#3f51b5] mb-[1vw] w-full text-center text-[2vw]">F24-89</h2>
             <table className="text-[#000] w-full border border-[#eaebf0] text-[0.7vw] rounded-sm shadow-lg">
                 <thead>
                     <tr className="h-[2vw] border-b border-b-[#eaebf0]">
@@ -307,21 +306,27 @@ export default function AdminDashboard() {
                     ))}
                 </tbody>
             </table>
-            <p className="text-[1.5vw] font-bold text-[#444444] mt-[1vw]">Supervisor</p>
+            <p className="text-[1.2vw] font-bold text-[#444444] mt-[1vw] w-full text-start">Supervisor</p>
             <div className="w-full h-[1vw] shadow-lg rounded-sm mt-[1vw] flex text-[#444444] text-[0.7vw] px-[1vw] py-[1.5vw] items-center justify-center border border-[#eaebf0]">
                 <p className="flex-1 font-bold">Zeeshan Ali Khan</p>
                 <p className="flex-1">zeeshan.alikhan@lhr.nu.edu.pk</p>
             </div>
-            {!addStudent ? <button className="bg-[#4e5fbb] hover:bg-[#3f51b5] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer mt-[1vw]"
-            onClick={()=>setAddStudent(true)}>Add a student</button> : <div className="">
+            {!addStudent ? <div className="flex mt-[1vw] items-center w-full"><div className="flex-1 w-full flex items-center justify-start"><button className="bg-[#4e5fbb] hover:bg-[#3f51b5] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer shadow-lg"
+            onClick={()=>setAddStudent(true)}>Add a student</button></div>
+            <div className="flex-1 flex gap-[0.5vw] items-center justify-end">
+                <button className="bg-[#4e5fbb] hover:bg-[#3f51b5] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer"
+                onClick={() => handleAccept(expandedRow)}>Accept</button>
+                <button className="bg-[#f4516c] hover:bg-[#ea4762] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer"
+                onClick={() => handleReject(expandedRow)}>Reject</button>
+            </div></div> : <div className="w-full flex items-center justify-start mt-[1vw]">
                 <input type="text" placeholder="l21xxxx@lhr.nu.edu.pk" className="h-[2vw] w-[12vw] shadow-lg border border-[#eaebf0] rounded-sm text-[#333333] p-[1vw] focus:outline-none" />
-                <button className="bg-[#4e5fbb] hover:bg-[#3f51b5] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer mt-[1vw] ml-[0.5vw] shadow-lg"
+                <button className="bg-[#4e5fbb] hover:bg-[#3f51b5] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer ml-[0.5vw] shadow-lg"
                 onClick={()=>{addStudentToGroup(expandedRow, {name: "Asmar", email: "iamasmar20@gmail.com", creditHours: 4})}}>Save</button>
-                <button className="bg-[#f4516c] hover:bg-[#ea4762] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer mt-[1vw] ml-[0.2vw] shadow-lg"
+                <button className="bg-[#f4516c] hover:bg-[#ea4762] transition duration-300 text-[#fff] font-bold px-[1vw] py-[0.5vw] rounded-sm inline-flex items-center gap-1 cursor-pointer ml-[0.2vw] shadow-lg"
                 onClick={()=>setAddStudent(false)}>Cancel</button>
             </div>}
+            </> ) : <p className="text-[#aaaaaa]">Click on a group to see details</p>}
         </div>
-        )}
     </div>
   )
 }
