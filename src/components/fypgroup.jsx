@@ -4,6 +4,7 @@ import { Pencil, ChevronDown } from 'lucide-react';
 import LeftSideBar from './LeftSideBar';
 import axios from 'axios';
 import { use } from 'react';
+import { toast } from 'react-toastify';
 
 const FYPGroupPage = () => {
 	const [title, setTitle] = useState('');
@@ -21,6 +22,7 @@ const FYPGroupPage = () => {
 	const [groupType, setGroupType] = useState();
 	const [receivedRequests, setReceivedRequests] = useState([]);
 	const [admin, setAdmin] = useState('');
+	const [adminCheck,setAdminCheck]=useState(false);
 
 	const bgClr = 'bg-[#f2f3f8]';
 	const fgClr = 'bg-[#3f51b5]';
@@ -83,6 +85,7 @@ const FYPGroupPage = () => {
 						Authorization: `Bearer ${token}`,
 					},
 				});
+				console.log("Here")
 				console.log(response.data);
 				setGroupMembers(response.data.group.studentsId);
 				setGroup(response.data.group._id);
@@ -145,6 +148,34 @@ const FYPGroupPage = () => {
 		}
 	};
 
+	const makeAdmin=async(id)=>{
+		const token = localStorage.getItem('token');
+		try {
+			const response=await axios.put(`http://localhost:4000/api/group/assignAdmin/${id}`,
+				{
+					adminId:admin
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			if(response.status===200){
+				toast.success("Role Changed Successfully!");
+				setTimeout(()=>{
+					window.location.reload();
+				},2000);
+			}
+
+			
+		} catch (error) {
+			toast.error("Something Went Wrong!");
+			console.log(error);
+		}
+
+	}
+
 	const updateGroup = async () => {
 		try {
 			const token = localStorage.getItem('token');
@@ -171,21 +202,26 @@ const FYPGroupPage = () => {
 	};
 
 	const leaveGroup = async () => {
-		try {
-			const token = localStorage.getItem('token');
-			const response = await axios.post(
-				'http://localhost:4000/api/group/leave',
-				null,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
-			console.log('Group left successfully:', response.data);
-			window.location.reload();
-		} catch (error) {
-			console.log(error);
+		if(adminCheck){
+			try {
+				const token = localStorage.getItem('token');
+				const response = await axios.post(
+					'http://localhost:4000/api/group/leave',
+					null,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+				console.log('Group left successfully:', response.data);
+				window.location.reload();
+			} catch (error) {
+				console.log(error);
+			}
+		}
+		else{
+			toast.error("Alot Admin Role before leaving");
 		}
 	};
 
@@ -289,6 +325,7 @@ const FYPGroupPage = () => {
 										</button>
 									) : (
 										userid == admin && (
+											<>
 											<button
 												className={`ml-auto bg-[#f4516c] font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#F33F5D] transition`}
 												onClick={() =>
@@ -299,6 +336,16 @@ const FYPGroupPage = () => {
 											>
 												Remove
 											</button>
+											<button
+												className={`ml-auto bg-[#007c3d] font-bold px-[1vw] py-[0.7vw] cursor-pointer rounded-sm hover:bg-[#02bc5e] transition`}
+												onClick={()=>{
+													makeAdmin(member._id,admin);
+												}
+												}
+											>
+												Make Admin
+											</button>
+											</>
 										)
 									)}
 								</div>
