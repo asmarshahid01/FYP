@@ -1,6 +1,7 @@
 import { React, useState } from 'react';
 import profilePic from '../assets/profile.jpg';
 import axios from 'axios';
+import {toast} from 'react-toastify';
 
 export default function ProfileBar({ user, role }) {
 	const loggedUser = JSON.parse(localStorage.getItem('userdetails'));
@@ -16,9 +17,11 @@ export default function ProfileBar({ user, role }) {
 		try {
 			const temprole = role == 'Teacher' ? 'Supervisor' : 'Student';
 			if (loggedUser.role === false) {
+				toast.error("You are not Leader");
 				console.log('You are not leader');
 				return;
 			} else {
+				console.log("Request is sending here!!")
 				const response = await axios.post(
 					'http://localhost:4000/api/request',
 					{
@@ -32,8 +35,11 @@ export default function ProfileBar({ user, role }) {
 						},
 					}
 				);
-				console.log('Request sent successfully:', response.data);
-				return response.data;
+				console.log(response);
+				if(response.status===201){
+					toast.success("Request sent successfully");
+					console.log('Request sent successfully:', response.data);
+				}
 			}
 		} catch (error) {
 			console.error(

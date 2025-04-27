@@ -3,6 +3,31 @@ import Notification from "../models/notifications.js";
 import Student from "../models/student.js";
 import Supervisor from "../models/supervisor.js";
 
+
+
+const makeAdmin=async(req,res)=>{
+  console.log("Make Admin APi Working");
+  try {
+    const id=req.params.id;
+    const adminId=req.body.adminId;
+    const student=await Student.findById(id);
+    const adminStudent=await Student.findById(adminId);
+    if(student && adminStudent){
+      student.role=true;
+      adminStudent.role=false;
+      await student.save();
+      await adminStudent.save();
+      return res.status(200).json({message:"Updated Successfully"});
+    }
+    else{
+      return res.status(404).json({ message: "Student not found" });
+    }
+  } catch (error) {
+
+    return res.status(404).json({ message: "Error in ID " });    
+  }
+}
+
 const approvalByAdmin = async (req, res) => {
 	console.log("Error in API");
 	try {
@@ -172,4 +197,5 @@ export {
   getSupervisorGroups,
   getGroupsForAdmin,
   approvalByAdmin,
+  makeAdmin
 };

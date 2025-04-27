@@ -18,6 +18,12 @@ import FypGroupDetails from './components/FypGroupDetails';
 import SupervisorLogin from './components/SupervisorLogin';
 import AdminHome from './components/AdminHome';
 import ReportCheckPage from './components/LatexCheck';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { LoaderProvider } from './context/LoaderContext';
+import 'react-overlay-loader/styles.css';
+import AdminAddAccounts from './components/AdminAddAccounts';
+
 
 // function App() {
 // 	return (
@@ -30,6 +36,7 @@ import ReportCheckPage from './components/LatexCheck';
 
 function App() {
 	return (
+		<LoaderProvider>
 		<Router>
 			<Routes>
 				<Route
@@ -39,6 +46,10 @@ function App() {
 				<Route
 					path='/admin'
 					element={<AdminHome />}
+				/>
+				<Route
+					path='/adminAccounts'
+					element={<AdminAddAccounts/>}
 				/>
 				<Route
 					path='/coordinator'
@@ -69,7 +80,14 @@ function App() {
 				<Route path='/supervisorlogin' element={<SupervisorLogin />} />
 				<Route path='/login' element={<LoginPage />} />
 			</Routes>
+			<ToastContainer
+			position='bottom-right'
+			autoClose={3000}
+			closeOnClick
+			theme='colored'
+			/>
 		</Router>
+		</LoaderProvider>
 	);
 }
 

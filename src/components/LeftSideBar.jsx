@@ -1,7 +1,9 @@
 import { React, useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
 import profileImage from '../assets/profile.jpg';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalLoader } from '../context/LoaderContext.jsx';
 import {
 	Home,
 	Mail,
@@ -24,6 +26,7 @@ const LeftSideBar = () => {
 	const accountType = 'supervisor';
 
 	const navigate = useNavigate();
+	const {showLoader,hideLoader}=useGlobalLoader();
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [bio, setBio] = useState('');
@@ -31,13 +34,13 @@ const LeftSideBar = () => {
 	const [userProfileExpand, setUserProfileExpand] = useState(false);
 	const [userImage, setUserImage] = useState(false);
 	const [selectedMenu, setSelectedMenu] = useState(1);
-
 	const fileInputRef = useRef(null);
 	const [tempProfilePic, setTempProfilePic] = useState(profileImage);
 	const [profilePic, setProfilePic] = useState(profileImage);
 	const [notificationsExpand, setNotificationsExpand] = useState(false);
 
 	const handleBioChange = async (e) => {
+		showLoader();
 		try {
 			const token = localStorage.getItem('token');
 			const usertype = localStorage.getItem('usertype');
@@ -73,13 +76,18 @@ const LeftSideBar = () => {
 			}
 			if (updateBio.status === 200) {
 				setBio(updateBio.data.bio);
+				toast.success("Updated")
 				console.log('Updated BIO');
 			}
 		} catch (error) {
 			console.error('Something Went Wrong ' + error);
+			toast.error('Error updating bio');
+		}
+		finally{
+			hideLoader();
 		}
 	};
-	const debouncedSaveBio = debounce(() => handleBioChange(), 10000);
+	const debouncedSaveBio = debounce(() => handleBioChange(), 1000);
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
