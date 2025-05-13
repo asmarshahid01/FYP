@@ -26,7 +26,7 @@ const LeftSideBar = () => {
 	const accountType = 'supervisor';
 
 	const navigate = useNavigate();
-	const {showLoader,hideLoader}=useGlobalLoader();
+	const { showLoader, hideLoader } = useGlobalLoader();
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [bio, setBio] = useState('');
@@ -76,14 +76,13 @@ const LeftSideBar = () => {
 			}
 			if (updateBio.status === 200) {
 				setBio(updateBio.data.bio);
-				toast.success("Updated")
+				toast.success('Updated');
 				console.log('Updated BIO');
 			}
 		} catch (error) {
 			console.error('Something Went Wrong ' + error);
 			toast.error('Error updating bio');
-		}
-		finally{
+		} finally {
 			hideLoader();
 		}
 	};
@@ -239,7 +238,7 @@ const LeftSideBar = () => {
 								setNotificationsExpand(false);
 							}}
 						>
-							<FileText /> Deliverables
+							<FileText /> Student Deliverables
 						</div>
 					)}
 					<div
@@ -254,6 +253,22 @@ const LeftSideBar = () => {
 						}}
 					>
 						<Bell /> Notifications
+					</div>
+					<div
+						className={`px-[1vw] py-[1vw] cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] duration-300 font-bold flex gap-[0.5vw]`}
+						onClick={() => {
+							navigate('/queries');
+						}}
+					>
+						<FileText /> Queries
+					</div>
+					<div
+						className={`px-[1vw] py-[1vw] cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] duration-300 font-bold flex gap-[0.5vw]`}
+						onClick={() => {
+							navigate('/deliverables');
+						}}
+					>
+						<FileText /> Deliverables
 					</div>
 				</nav>
 

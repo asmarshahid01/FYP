@@ -12,7 +12,7 @@ import Inbox from './components/Inbox';
 import FYPGroupPage from './components/fypgroup';
 import LoginPage from './components/LoginPage';
 import StudentPage from './components/StudentPage';
-import TeacherPage from './components/TeacherPage';
+import CoordinatorLogin from './components/CoordinatorLogin';
 import SupervisorHomePage from './components/SupervisorHomePage';
 import FypGroupDetails from './components/FypGroupDetails';
 import SupervisorLogin from './components/SupervisorLogin';
@@ -23,8 +23,13 @@ import { ToastContainer } from 'react-toastify';
 import { LoaderProvider } from './context/LoaderContext';
 import 'react-overlay-loader/styles.css';
 import AdminAddAccounts from './components/AdminAddAccounts';
-
-
+import CoordinatorHomePage from './components/CoordinatorHomePage';
+import Announcements from './components/Announcements';
+import Checker from './components/Checker';
+import CoordinatorQueries from './components/CoordinatorQueries';
+import CoordinatorDeliverables from './components/CoordinatorDeliverables';
+import Queries from './components/Queries';
+import Deliverables from './components/Deliverables';
 // function App() {
 // 	return (
 // 		<HomePage></HomePage>
@@ -37,56 +42,75 @@ import AdminAddAccounts from './components/AdminAddAccounts';
 function App() {
 	return (
 		<LoaderProvider>
-		<Router>
-			<Routes>
-				<Route
-					path='/'
-					element={<ProtectedRoute element={<SupervisorHomePage />} />}
-				/>
-				<Route
-					path='/admin'
-					element={<AdminHome />}
-				/>
-				<Route
-					path='/adminAccounts'
-					element={<AdminAddAccounts/>}
-				/>
-				<Route
-					path='/coordinator'
-					element={<ReportCheckPage />}
-				/>
+			<Router>
+				<Routes>
+					<Route
+						path='/'
+						element={<ProtectedRoute element={<SupervisorHomePage />} />}
+					/>
+					<Route path='/admin' element={<AdminHome />} />
+					<Route path='/adminAccounts' element={<AdminAddAccounts />} />
+					<Route path='/coordinator' element={<ReportCheckPage />} />
 
-				<Route path='/inbox' element={<ProtectedRoute element={<Inbox />} />} />
-				<Route
-					path='/group'
-					element={<ProtectedRoute element={<FYPGroupPage />} />}
+					<Route
+						path='/inbox'
+						element={<ProtectedRoute element={<Inbox />} />}
+					/>
+					<Route
+						path='/group'
+						element={<ProtectedRoute element={<FYPGroupPage />} />}
+					/>
+					<Route
+						path='/supervisorgroup'
+						element={<ProtectedRoute element={<FypGroupDetails />} />}
+					/>
+					<Route
+						path='/home'
+						element={<ProtectedRoute element={<HomePage />} />}
+					/>
+					<Route
+						path='/profile/:userId'
+						element={<ProtectedRoute element={<StudentPage />} />}
+					/>
+					<Route
+						path='/supervisorhome'
+						element={<ProtectedRoute element={<SupervisorHomePage />} />}
+					/>
+					<Route path='/supervisorlogin' element={<SupervisorLogin />} />
+					<Route path='/coordinatorlogin' element={<CoordinatorLogin />} />
+					<Route path='/login' element={<LoginPage />} />
+					<Route
+						path='/announcements'
+						element={<ProtectedRoute element={<Announcements />} />}
+					/>
+					<Route
+						path='/checker'
+						element={<ProtectedRoute element={<Checker />} />}
+					/>
+					<Route
+						path='/coordinatorqueries'
+						element={<ProtectedRoute element={<CoordinatorQueries />} />}
+					/>
+					<Route
+						path='/coordinatordeliverables'
+						element={<ProtectedRoute element={<CoordinatorDeliverables />} />}
+					/>
+					<Route
+						path='/queries'
+						element={<ProtectedRoute element={<Queries />} />}
+					/>
+					<Route
+						path='/deliverables'
+						element={<ProtectedRoute element={<Deliverables />} />}
+					/>
+				</Routes>
+				<ToastContainer
+					position='bottom-right'
+					autoClose={3000}
+					closeOnClick
+					theme='colored'
 				/>
-				<Route
-					path='/supervisorgroup'
-					element={<ProtectedRoute element={<FypGroupDetails />} />}
-				/>
-				<Route
-					path='/home'
-					element={<ProtectedRoute element={<HomePage />} />}
-				/>
-				<Route
-					path='/profile/:userId'
-					element={<ProtectedRoute element={<StudentPage />} />}
-				/>
-				<Route
-					path='/supervisorhome'
-					element={<ProtectedRoute element={<SupervisorHomePage />} />}
-				/>
-				<Route path='/supervisorlogin' element={<SupervisorLogin />} />
-				<Route path='/login' element={<LoginPage />} />
-			</Routes>
-			<ToastContainer
-			position='bottom-right'
-			autoClose={3000}
-			closeOnClick
-			theme='colored'
-			/>
-		</Router>
+			</Router>
 		</LoaderProvider>
 	);
 }
