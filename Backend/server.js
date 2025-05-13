@@ -6,9 +6,10 @@ import postRoutes from './routes/postRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
-import notificationRoutes from "./routes/notificationRoutes.js";
-import coordinatorRoutes from "./routes/coordinatorRoutes.js";
+import notificationRoutes from './routes/notificationRoutes.js';
+import coordinatorRoutes from './routes/coordinatorRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import assignmentRoutes from './routes/assignmentRoutes.js';
 
 import cors from 'cors';
 
@@ -31,10 +32,11 @@ app.use('/api/post', postRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/request', requestRoutes);
 app.use('/api/group', groupRoutes);
-app.use('/api/supervisor',supervisorRoutes);
-app.use('/api/notification',notificationRoutes);
-app.use('/api/coordinator',coordinatorRoutes);
-app.use('/api/admin',adminRoutes);
+app.use('/api/supervisor', supervisorRoutes);
+app.use('/api/notification', notificationRoutes);
+app.use('/api/coordinator', coordinatorRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/assignment', assignmentRoutes);
 
 app.listen(port, () => {
 	console.log('SERVER IS ON!!');

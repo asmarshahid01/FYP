@@ -4,6 +4,11 @@ import path from 'path';
 import fs from 'fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Announcement from '../models/announcement.js';
+import Supervisor from '../models/supervisor.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+const { JWT_SECRET } = process.env;
 
 let result = [];
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -267,118 +272,7 @@ function checkReferences(bibtext) {
 	}
 }
 
-
-export const checkFile=(req,res)=>{
-	
-    result = [];
-	if (!req.file) {
-		return res.status(400).send({ message: 'No file uploaded!' });
-	}
-
-	const zipPath = req.file.path;
-	const zipName = path.parse(req.file.originalname).name; // Name of the ZIP file (without extension)
-	const extractPath = path.join(__dirname, 'extracted');
-
-	try {
-		// Extract ZIP file
-		const zip = new AdmZip(zipPath);
-		zip.extractAllTo(extractPath, true);
-
-		// List extracted files
-		let files = fs.readdirSync(extractPath);
-
-		// Remove uploaded ZIP to save space
-		fs.unlinkSync(zipPath);
-
-		//Check References
-		let bibFile = files.find((file) => file.endsWith('.bib'));
-		let bibtext;
-		let targetDirPath = path.join(extractPath, zipName);
-		if (!bibFile) {
-			if (fs.existsSync(targetDirPath)) {
-				files = fs.readdirSync(targetDirPath);
-				bibFile = files.find((file) => file.endsWith('.bib'));
-				bibtext = fs.readFileSync(`${targetDirPath}/${bibFile}`, 'utf-8');
-			}
-			if (!bibFile) {
-				targetDirPath = path.join(extractPath, 'FYPFast');
-				if (fs.existsSync(targetDirPath)) {
-					files = fs.readdirSync(targetDirPath);
-					bibFile = files.find((file) => file.endsWith('.bib'));
-					bibtext = fs.readFileSync(`${targetDirPath}/${bibFile}`, 'utf-8');
-				} else {
-					console.log('No bib file found!');
-				}
-			}
-		} else {
-			bibtext = fs.readFileSync(`${extractPath}/${bibFile}`, 'utf-8');
-		}
-		checkReferences(bibtext);
-
-		//Check tex file
-		files = fs.readdirSync(extractPath);
-		let texFile = files.find((file) => file.endsWith('.tex'));
-		let textext;
-		let texpath;
-		if (!texFile) {
-			targetDirPath = path.join(extractPath, zipName);
-			if (fs.existsSync(targetDirPath)) {
-				files = fs.readdirSync(targetDirPath);
-				texFile = files.find((file) => file.endsWith('.tex'));
-				texpath = `${targetDirPath}`;
-				textext = fs.readFileSync(`${targetDirPath}/${texFile}`, 'utf-8');
-			}
-			if (!texFile) {
-				targetDirPath = path.join(extractPath, 'FYPFast');
-				if (fs.existsSync(targetDirPath)) {
-					files = fs.readdirSync(targetDirPath);
-					texFile = files.find((file) => file.endsWith('.tex'));
-					console.log(texFile);
-					texpath = `${targetDirPath}`;
-					textext = fs.readFileSync(`${targetDirPath}/${texFile}`, 'utf-8');
-				} else {
-					console.log('No tex file found!');
-				}
-			}
-		} else {
-			texpath = `${extractPath}`;
-			textext = fs.readFileSync(`${extractPath}/${texFile}`, 'utf-8');
-		}
-		const pdfFile = path.join(texpath, texFile.replace('.tex', '.pdf'));
-
-		const command = `cd "${texpath}" && C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex -interaction=nonstopmode "${texFile}"`;
-
-		exec(command, (error, stdout, stderr) => {
-			if (error) {
-				console.log("Error was,",error);
-			}
-
-			if (fs.existsSync(pdfFile)) {
-				console.log('Compilation successful! Valid Latex File.');
-			} else {
-				console.error('PDF not generated. Checking log file for issues...');
-			}
-		});
-		const students = extractStudentNames(textext);
-		checkNames(textext, students);
-		checkCaptionsFigures(textext);
-		checkHeadings(textext);
-		checkChapterConclusion(textext);
-		checkCaptionsInUseCases(textext);
-		//findPageNumber(pdfFile);
-		res.status(200).send(result);
-	} catch (error) {
-		res
-			.status(500)
-			.send({ message: 'Error processing ZIP file', error, result });
-	}
-
-}
-
-
-
-export const downloadFile=(req,res)=>{
-	
+export const checkFile = (req, res) => {
 	result = [];
 	if (!req.file) {
 		return res.status(400).send({ message: 'No file uploaded!' });
@@ -459,7 +353,112 @@ export const downloadFile=(req,res)=>{
 
 		exec(command, (error, stdout, stderr) => {
 			if (error) {
-				console.log("Error was,",error);
+				console.log('Error was,', error);
+			}
+
+			if (fs.existsSync(pdfFile)) {
+				console.log('Compilation successful! Valid Latex File.');
+			} else {
+				console.error('PDF not generated. Checking log file for issues...');
+			}
+		});
+		const students = extractStudentNames(textext);
+		checkNames(textext, students);
+		checkCaptionsFigures(textext);
+		checkHeadings(textext);
+		checkChapterConclusion(textext);
+		checkCaptionsInUseCases(textext);
+		//findPageNumber(pdfFile);
+		res.status(200).send(result);
+	} catch (error) {
+		res
+			.status(500)
+			.send({ message: 'Error processing ZIP file', error, result });
+	}
+};
+
+export const downloadFile = (req, res) => {
+	result = [];
+	if (!req.file) {
+		return res.status(400).send({ message: 'No file uploaded!' });
+	}
+
+	const zipPath = req.file.path;
+	const zipName = path.parse(req.file.originalname).name; // Name of the ZIP file (without extension)
+	const extractPath = path.join(__dirname, 'extracted');
+
+	try {
+		// Extract ZIP file
+		const zip = new AdmZip(zipPath);
+		zip.extractAllTo(extractPath, true);
+
+		// List extracted files
+		let files = fs.readdirSync(extractPath);
+
+		// Remove uploaded ZIP to save space
+		fs.unlinkSync(zipPath);
+
+		//Check References
+		let bibFile = files.find((file) => file.endsWith('.bib'));
+		let bibtext;
+		let targetDirPath = path.join(extractPath, zipName);
+		if (!bibFile) {
+			if (fs.existsSync(targetDirPath)) {
+				files = fs.readdirSync(targetDirPath);
+				bibFile = files.find((file) => file.endsWith('.bib'));
+				bibtext = fs.readFileSync(`${targetDirPath}/${bibFile}`, 'utf-8');
+			}
+			if (!bibFile) {
+				targetDirPath = path.join(extractPath, 'FYPFast');
+				if (fs.existsSync(targetDirPath)) {
+					files = fs.readdirSync(targetDirPath);
+					bibFile = files.find((file) => file.endsWith('.bib'));
+					bibtext = fs.readFileSync(`${targetDirPath}/${bibFile}`, 'utf-8');
+				} else {
+					console.log('No bib file found!');
+				}
+			}
+		} else {
+			bibtext = fs.readFileSync(`${extractPath}/${bibFile}`, 'utf-8');
+		}
+		checkReferences(bibtext);
+
+		//Check tex file
+		files = fs.readdirSync(extractPath);
+		let texFile = files.find((file) => file.endsWith('.tex'));
+		let textext;
+		let texpath;
+		if (!texFile) {
+			targetDirPath = path.join(extractPath, zipName);
+			if (fs.existsSync(targetDirPath)) {
+				files = fs.readdirSync(targetDirPath);
+				texFile = files.find((file) => file.endsWith('.tex'));
+				texpath = `${targetDirPath}`;
+				textext = fs.readFileSync(`${targetDirPath}/${texFile}`, 'utf-8');
+			}
+			if (!texFile) {
+				targetDirPath = path.join(extractPath, 'FYPFast');
+				if (fs.existsSync(targetDirPath)) {
+					files = fs.readdirSync(targetDirPath);
+					texFile = files.find((file) => file.endsWith('.tex'));
+					console.log(texFile);
+					texpath = `${targetDirPath}`;
+					textext = fs.readFileSync(`${targetDirPath}/${texFile}`, 'utf-8');
+				} else {
+					console.log('No tex file found!');
+				}
+			}
+		} else {
+			texpath = `${extractPath}`;
+			textext = fs.readFileSync(`${extractPath}/${texFile}`, 'utf-8');
+		}
+		const pdfFile = path.join(texpath, texFile.replace('.tex', '.pdf'));
+
+		const command = `cd "${texpath}" && C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex -interaction=nonstopmode "${texFile}"`;
+
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				console.log('Error was,', error);
 			}
 
 			if (fs.existsSync(pdfFile)) {
@@ -475,10 +474,101 @@ export const downloadFile=(req,res)=>{
 				res.status(500).send('Error downloading the file');
 			}
 		});
-	}
-	catch(error){
+	} catch (error) {
 		res
 			.status(500)
 			.send({ message: 'Error processing ZIP file', error, result });
 	}
-}
+};
+
+export const login = async (req, res) => {
+	try {
+		console.log(req.body);
+		const { email, password } = req.body;
+
+		const user = await Supervisor.findOne({ email });
+		console.log(user);
+		if (!user) {
+			return res.status(400).json({ message: 'No teacher with that email!' });
+		}
+		const isMatched = bcrypt.compareSync(password, user.password);
+		if (!isMatched) {
+			return res.status(400).json({ message: 'Incorrect password!' });
+		}
+		if (!user.coordinator) {
+			return res
+				.status(400)
+				.json({ message: 'This supervisor is not a coordinator!' });
+		}
+		const token = jwt.sign({ id: user._id }, JWT_SECRET, {
+			expiresIn: '8h',
+		});
+		const usertype = 'Coordinator';
+		const userdetails = {
+			name: user.name,
+			email: user.email,
+		};
+		console.log(userdetails);
+		res
+			.status(200)
+			.json({ message: 'Login successful', token, usertype, userdetails });
+	} catch (err) {
+		res.status(400).json({ message: 'Some error in login', err });
+	}
+};
+
+// Create a new announcement
+export const createAnnouncement = async (req, res) => {
+	try {
+		const coordinatorId = req.user.id;
+		const { content } = req.body;
+		if (!content)
+			return res.status(400).json({ message: 'Content is required' });
+		const announcement = await Announcement.create({
+			coordinator: coordinatorId,
+			content,
+		});
+		res.status(201).json(announcement);
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: 'Error creating announcement', error: err.message });
+	}
+};
+
+// Get all announcements by the logged-in coordinator
+export const getMyAnnouncements = async (req, res) => {
+	try {
+		const coordinatorId = req.user.id;
+		const announcements = await Announcement.find({
+			coordinator: coordinatorId,
+		}).sort({ createdAt: -1 });
+		res.status(200).json(announcements);
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: 'Error fetching announcements', error: err.message });
+	}
+};
+
+// Delete an announcement by ID (only by the owner)
+export const deleteAnnouncement = async (req, res) => {
+	try {
+		const coordinatorId = req.user.id;
+		const { id } = req.params;
+		const announcement = await Announcement.findOne({
+			_id: id,
+			coordinator: coordinatorId,
+		});
+		if (!announcement)
+			return res
+				.status(404)
+				.json({ message: 'Announcement not found or not authorized' });
+		await announcement.deleteOne();
+		res.status(200).json({ message: 'Announcement deleted' });
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: 'Error deleting announcement', error: err.message });
+	}
+};
