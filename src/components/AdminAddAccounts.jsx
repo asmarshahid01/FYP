@@ -27,6 +27,7 @@ export default function AdminAddAccounts() {
     const [addEmail, setAddEmail] = useState();
     const [addPassword, setAddPassword] = useState();
     const [addSlots, setAddSlots] = useState(0);
+    const [addGpa,setGpta]=useState("");
     const {hideLoader,showLoader}=useGlobalLoader();
 
 
@@ -154,7 +155,8 @@ export default function AdminAddAccounts() {
                 data:{
                     "name":addName,
                     "password":addPassword,
-                    "email":addEmail
+                    "email":addEmail,
+                    "gpa":addGpa
                 },
                 type:"student"
             });
@@ -216,24 +218,49 @@ export default function AdminAddAccounts() {
         setIsSupervisor(true);
     };
 
-    const updateAccount = (id) => {
-        setStudentsData((prevData) =>
-          prevData.map((account) =>
-            account._id === id
-              ? { ...account, name: editName, password: editPassword }
-              : account
-          )
-        );
+    const updateAccount = async(id) => {
+
+        try {
+            const response=await axios.patch(`http://localhost:4000/api/admin/update/student/${id}`,{
+                name:editName,
+                password:editPassword
+            });
+
+            if(response.status===200){
+                toast.success("Updated");
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Something Went Wrong");
+        }
+
+        // setStudentsData((prevData) =>
+        //   prevData.map((account) =>
+        //     account._id === id
+        //       ? { ...account, name: editName, password: editPassword }
+        //       : account
+        //   )
+        // );
       };
 
-      const updateSupervisorAccount = (id) => {
-        setSupervisorsData((prevData) =>
-          prevData.map((account) =>
-            account._id === id
-              ? { ...account, name: editName, password: editPassword, slots: editSlots }
-              : account
-          )
-        );
+      const updateSupervisorAccount = async(id) => {
+
+        try {
+            const response=await axios.patch(`http://localhost:4000/api/admin/update/supervisor/${id}`,{
+                name:editName,
+                password:editPassword,
+                slot:editSlots,
+            });
+
+            if(response.status===200){
+                toast.success("Updated");
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Something Went Wrong");
+        }
       };
 
     const toggleSelectAllStudents = () => {
@@ -498,6 +525,10 @@ export default function AdminAddAccounts() {
                     <label className="font-bold text-[#333333]">Password</label>
                     <input type="text" value={addPassword} onChange={(e) => setAddPassword(e.target.value)} className="shadow-lg text-[#333333] focus:outline-none text-[0.7vw] px-[1vw] py-[0.8vw] border border-[#eaebf0] rounded-sm w-full" />
                 </div>
+                {addStudent && <div className="flex flex-col w-full">
+                    <label className="font-bold text-[#333333]">Add Gpa</label>
+                    <input type="text" value={addGpa} onChange={(e) => setGpta(e.target.value)} className="shadow-lg text-[#333333] focus:outline-none text-[0.7vw] px-[1vw] py-[0.8vw] border border-[#eaebf0] rounded-sm w-full" />
+                </div>}
                 {addSupervisor && <div className="flex flex-col w-full">
                     <label className="font-bold text-[#333333]">Slots</label>
                     <input type="text" value={addSlots} onChange={(e) => setAddSlots(e.target.value)} className="shadow-lg text-[#333333] focus:outline-none text-[0.7vw] px-[1vw] py-[0.8vw] border border-[#eaebf0] rounded-sm w-full" />

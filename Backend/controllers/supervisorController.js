@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { match } from "assert";
 
 const { JWT_SECRET } = process.env;
 
@@ -175,4 +176,38 @@ const getSupervisorById = async (req, res) => {
   }
 };
 
-export { getSupervisorById, login,upload,updateBio,getInfo };
+
+
+const getStudents=async(req,res)=>{
+
+  // console.log("Inside getSTU");
+	try{
+		const userID = req.user.id;
+
+
+		const results=await Supervisor.findById(userID).populate({
+			path:'fypGroups',
+			populate:{
+				path:'studentsId',
+        match:{role:true}
+			},
+		});
+    console.log(results);
+
+    if (!results || !results.fypGroups || results.fypGroups.length === 0) {
+      return res.status(404).json({ message: "No FYP groups or supervisor not found" });
+    }
+    const students = results.fypGroups.flatMap(group => group.studentsId);
+    console.log("Students ",students);
+
+		return res.status(200).json({message:"Success",data:students});
+	
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server error" });
+	}
+
+
+}
+
+export { getSupervisorById, login,upload,updateBio,getInfo,getStudents };

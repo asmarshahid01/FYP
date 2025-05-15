@@ -16,9 +16,11 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import Notifications from './Notifications';
+import { useAuthContext } from '../context/AuthContext.jsx';
 
 const LeftSideBar = () => {
 	const userType = localStorage.getItem('usertype');
+	const {setAuthUser,authUser,authRole} = useAuthContext();
 	const bgClr = 'bg-[#2a363b]';
 	const fgClr = 'bg-[#292b3a]';
 	const borderClr = 'border-[#282e3b]';
@@ -201,8 +203,13 @@ const LeftSideBar = () => {
       cursor-pointer hover:text-[#f7c402] border border-transparent hover:border-t-[#f7c402] hover:border-b-[#f7c402] 
       duration-300 font-bold flex gap-[0.5vw]`}
 						onClick={() => {
+							if(authUser.role || authRole==="Teacher"){
 							setSelectedMenu(2);
 							navigate('/inbox');
+							}
+							else{
+								toast.error('Only Leader can chat!');
+							}
 							setNotificationsExpand(false);
 						}}
 					>
@@ -276,6 +283,9 @@ const LeftSideBar = () => {
 				<button
 					onClick={() => {
 						localStorage.removeItem('token');
+						localStorage.removeItem('userdetails');
+						localStorage.removeItem('usertype');
+						setAuthUser(null);
 						navigate('/login');
 					}}
 					className={`mt-auto ${fgClr} px-[1vw] py-[1vw] border-l-[0.2vw] border-l-[#f4516c] hover:text-[#f4516c] cursor-pointer hover:border-t-[#f4516c] hover:border-b-[#f4516c] border border-transparent duration-300 w-full font-bold select-none flex gap-[0.5vw]`}

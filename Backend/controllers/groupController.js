@@ -87,7 +87,7 @@ const approvalByAdmin = async (req, res) => {
 
 const getGroupsForAdmin = async (req, res) => {
   try {
-    const groups = await Fypgroup.find()
+    const groups = await Fypgroup.find({approved:false})
       .populate("studentsId")
       .populate("supervisorId")
       .exec();
