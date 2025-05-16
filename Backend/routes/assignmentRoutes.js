@@ -9,6 +9,8 @@ import {
 	submitDeliverable,
 	unsubmitDeliverable,
 	deliverableUpload,
+	downloadSubmissions,
+	checkSubmissions,
 } from '../controllers/assignmentController.js';
 import authenticate from '../middleware.js';
 
@@ -31,5 +33,11 @@ router.get('/:id', authenticate, getAssignmentById);
 router.put('/:id', authenticate, updateAssignment);
 // Delete assignment
 router.delete('/:id', authenticate, deleteAssignment);
+
+// Download all submissions for an assignment
+router.get('/download/:assignmentId', authenticate, downloadSubmissions);
+
+// Check submissions using 2d2.js validator
+router.post('/check/:assignmentId', authenticate, checkSubmissions);
 
 export default router;
