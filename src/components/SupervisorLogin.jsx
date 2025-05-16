@@ -4,10 +4,12 @@ import { Lock, User } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../context/AuthContext';
 
 export default function SupervisorLogin() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const {setAuthUser,setAuthRole}=useAuthContext();
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
@@ -29,6 +31,8 @@ export default function SupervisorLogin() {
 			if (userdetails) {
 				localStorage.setItem('userdetails', JSON.stringify(userdetails));
 			}
+			setAuthUser(userdetails);
+			setAuthRole(usertype);
 			navigate('/supervisorhome');
 			console.log('User signed up successfully:', response.data);
 		} catch (error) {

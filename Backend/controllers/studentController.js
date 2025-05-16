@@ -110,6 +110,7 @@ const login = async (req, res) => {
 			email: user.email,
 			profile: user.profile,
 			role: user.role,
+			image:user.imageUrl,
 		};
 		console.log(userdetails);
 		res
@@ -173,4 +174,31 @@ const getStudentbyId = async (req, res) => {
 	}
 };
 
-export { login, getInfo, updateBio, getStudentbyId, upload };
+
+
+const getSupervisor=async(req,res)=>{
+	// console.log("Inside getSUP");
+	try{
+		const userID = req.user.id;
+
+
+		const results=await Student.findById(userID).populate({
+			path:'groupId',
+			populate:{
+				path:'supervisorId'
+			}
+		});
+
+		if(!results){
+			return res.status(202).json({message:"Not made"});
+		}
+		return res.status(200).json({message:"Success",data:results.groupId.supervisorId});
+	
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server error" });
+	}
+
+}
+
+export { login, getInfo, updateBio, getStudentbyId, upload,getSupervisor };

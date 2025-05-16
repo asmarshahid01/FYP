@@ -6,7 +6,9 @@ import {
   fetchStudents,
   fetchSupervisors,
   AddSingle,
-  DeleteSingle
+  DeleteSingle,
+  updateDataStudent,
+  updateDataSupervisor
 } from "../controllers/adminController.js";
 
 const upload = multer({ dest: "dataUploads/" });
@@ -18,5 +20,7 @@ router.get("/fetchSupervisors", fetchSupervisors);
 router.post("/populate/DB", upload.single("file"), AddStudentsDb);
 router.post("/addSingle/DB", AddSingle);
 router.delete('/delete/DB/:id',DeleteSingle);
+router.patch('/update/student/:id',updateDataStudent);
+router.patch('/update/supervisor/:id',updateDataSupervisor);
 
 export default router;

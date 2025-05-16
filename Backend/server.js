@@ -10,6 +10,8 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import coordinatorRoutes from './routes/coordinatorRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import { app,server } from './socket/socket.js';
 import queryRoutes from './routes/queryRoutes.js';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -36,7 +38,7 @@ uploadDirs.forEach((dir) => {
 
 await connect();
 
-const app = express();
+// const app = express();
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -58,8 +60,9 @@ app.use('/api/notification', notificationRoutes);
 app.use('/api/coordinator', coordinatorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignment', assignmentRoutes);
+app.use('/api/chats',chatRoutes);
 app.use('/api/query', queryRoutes);
 
-app.listen(port, () => {
+server.listen(port, () => {
 	console.log('SERVER IS ON!!');
 });

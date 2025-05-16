@@ -54,6 +54,13 @@ const AddStudentsDb=async(req,res)=>{
         .on("end",async()=>{
             try {
                 console.log(req.body.status);
+
+            if(req.body.status==='supervisor'){
+                await Supervisor.insertMany(results);
+            }
+            else{
+                await Student.insertMany(results);
+            }
                 console.log("Data POPULATED");
                 console.log(results);
                 fs.unlinkSync(req.file.path);
@@ -94,6 +101,7 @@ const AddSingle=async(req,res)=>{
                 notificatons:[],
                 profile:"I Love Fast",
                 imageUrl:"",
+                gpa:data.gpa
                 
             }
             await Student.insertOne(user);
@@ -148,4 +156,55 @@ const DeleteSingle=async(req,res)=>{
 }
 
 
-export {AddStudentsDb,fetchStudents,fetchSupervisors,AddSingle,DeleteSingle};
+
+const updateDataStudent=async(req,res)=>{
+    const {id}=req.params;
+
+    try {
+
+        const user=await Student.findById(id);
+        if(!user){
+            return res.status(404).json({message:"Not found"});
+        }
+        user.name=req.body.name;
+        const password=await bcrypt.hash(req.body.password,10);
+        user.password=password;
+
+        await user.save();
+
+        return res.status(200).json({message:"Success"});
+        
+    
+    } catch (error) {
+        return res.status(500).json({message:"Something Went Wrong with the Server"});
+    }
+
+
+
+}
+
+
+const updateDataSupervisor=async(req,res)=>{
+const {id}=req.params;
+
+    try {
+        const user=await Supervisor.findById(id);
+        if(!user){
+            return res.status(404).json({message:"Not found"});
+        }
+        user.name=req.body.name;
+        const password=await bcrypt.hash(req.body.password,10);
+        user.password=password;
+        user.fypCount=req.body.slot;
+
+        await user.save();
+
+        return res.status(200).json({message:"Success"});
+        
+    
+    } catch (error) {
+        return res.status(500).json({message:"Something Went Wrong with the Server"});
+    }
+}
+
+export {AddStudentsDb,fetchStudents,fetchSupervisors,AddSingle,DeleteSingle,updateDataStudent,updateDataSupervisor};

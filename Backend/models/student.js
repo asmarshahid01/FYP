@@ -1,3 +1,4 @@
+import { truncateSync } from 'fs';
 import mongoose, { Schema } from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
@@ -19,15 +20,18 @@ const studentSchema = new mongoose.Schema({
 	},
 	profile: {
 		type: String,
+		default:"Student of Fast"
 	},
 	status: {
 		type: String,
+		default:"Empty"
 	},
 	gpa: {
 		type: String,
 	},
 	role: {
 		type: Boolean,
+		default:true,
 	},
 	groupId: {
 		type: Schema.Types.ObjectId,

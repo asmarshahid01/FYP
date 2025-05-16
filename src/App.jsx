@@ -30,6 +30,8 @@ import CoordinatorQueries from './components/CoordinatorQueries';
 import CoordinatorDeliverables from './components/CoordinatorDeliverables';
 import Queries from './components/Queries';
 import Deliverables from './components/Deliverables';
+import SocketProvider from './context/SocketContext';
+import { AuthContext, AuthContextProvider } from './context/AuthContext';
 import StudentAnnouncements from './components/StudentAnnouncements';
 // function App() {
 // 	return (
@@ -40,8 +42,12 @@ import StudentAnnouncements from './components/StudentAnnouncements';
 // 	);
 // }
 
+const userId=JSON.parse(localStorage.getItem("userdetails"));
+console.log("CHEKING HEERe",userId);
+
 function App() {
 	return (
+
 		<LoaderProvider>
 			<Router>
 				<Routes>
