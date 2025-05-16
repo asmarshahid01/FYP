@@ -572,3 +572,15 @@ export const deleteAnnouncement = async (req, res) => {
 			.json({ message: 'Error deleting announcement', error: err.message });
 	}
 };
+
+export const getAllAnnouncements = async (req, res) => {
+	try {
+		const announcements = await Announcement.find({}).sort({ createdAt: -1 });
+		res.status(200).json(announcements);
+	} catch (err) {
+		res.status(500).json({
+			message: 'Error fetching all announcements',
+			error: err.message,
+		});
+	}
+};

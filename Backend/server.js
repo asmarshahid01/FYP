@@ -12,8 +12,29 @@ import adminRoutes from './routes/adminRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import { app,server } from './socket/socket.js';
-
+import queryRoutes from './routes/queryRoutes.js';
+import mongoose from 'mongoose';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure upload directories exist
+const uploadDirs = [
+	'./uploads/students',
+	'./uploads/students/deliverables',
+	'./uploads/students/profiles',
+];
+
+uploadDirs.forEach((dir) => {
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, { recursive: true });
+		console.log(`Created directory: ${dir}`);
+	}
+});
 
 await connect();
 
@@ -40,6 +61,7 @@ app.use('/api/coordinator', coordinatorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignment', assignmentRoutes);
 app.use('/api/chats',chatRoutes);
+app.use('/api/query', queryRoutes);
 
 server.listen(port, () => {
 	console.log('SERVER IS ON!!');

@@ -32,6 +32,7 @@ import Queries from './components/Queries';
 import Deliverables from './components/Deliverables';
 import SocketProvider from './context/SocketContext';
 import { AuthContext, AuthContextProvider } from './context/AuthContext';
+import StudentAnnouncements from './components/StudentAnnouncements';
 // function App() {
 // 	return (
 // 		<HomePage></HomePage>
@@ -108,6 +109,10 @@ function App() {
 					<Route
 						path='/deliverables'
 						element={<ProtectedRoute element={<Deliverables />} />}
+					/>
+					<Route
+						path='/student-announcements'
+						element={<ProtectedRoute element={<StudentAnnouncements />} />}
 					/>
 				</Routes>
 				<ToastContainer

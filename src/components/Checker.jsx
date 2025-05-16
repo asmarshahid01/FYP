@@ -5,6 +5,8 @@ import axios from 'axios';
 const Checker = () => {
 	const [tab, setTab] = useState('automatic');
 	const [assignments, setAssignments] = useState([]);
+	const [checking, setChecking] = useState(false);
+	const [selectedDeliverable, setSelectedDeliverable] = useState('');
 	const token = localStorage.getItem('token');
 
 	useEffect(() => {
@@ -20,6 +22,96 @@ const Checker = () => {
 		};
 		fetchAssignments();
 	}, [token]);
+
+	const handleDownload = async (assignmentId, title) => {
+		try {
+			// Create a safe directory name from the assignment title
+			const safeDirName = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+			// Make a request to download all files in the assignment directory
+			const response = await axios.get(
+				`http://localhost:4000/api/assignment/download/${assignmentId}`,
+				{
+					headers: { Authorization: `Bearer ${token}` },
+					responseType: 'blob',
+				}
+			);
+
+			// Create a blob from the response data
+			const blob = new Blob([response.data], { type: 'application/zip' });
+
+			// Create a download link and trigger the download
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `${safeDirName}_submissions.zip`;
+			document.body.appendChild(link);
+			link.click();
+
+			// Clean up
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(link);
+		} catch (error) {
+			console.error('Error downloading submissions:', error);
+			alert('Failed to download submissions. Please try again.');
+		}
+	};
+
+	const getCheckerKey = (title) => {
+		title = title.toLowerCase();
+		if (title.includes('fyp 1 deliverable 2')) return '1d2';
+		if (title.includes('fyp 1 deliverable 3')) return '1d3';
+		if (title.includes('fyp 2 deliverable 1')) return '2d1';
+		if (
+			title.includes('fyp 2 deliverable 2') ||
+			title.includes('fyp 2 final report')
+		)
+			return '2d2';
+		return null;
+	};
+
+	const handleCheck = async (assignmentId, title) => {
+		const checkerKey = getCheckerKey(title);
+		if (!checkerKey) {
+			alert('This checker is only for FYP 1/2 deliverables and reports.');
+			return;
+		}
+
+		setChecking(true);
+		try {
+			// Call the backend to run the appropriate checker
+			const response = await axios.post(
+				`http://localhost:4000/api/assignment/check/${assignmentId}`,
+				{ checkerKey },
+				{
+					headers: { Authorization: `Bearer ${token}` },
+					responseType: 'blob',
+				}
+			);
+
+			// Create a blob from the response data
+			const blob = new Blob([response.data], { type: 'text/csv' });
+
+			// Create a download link and trigger the download
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `${title
+				.replace(/[^a-z0-9]/gi, '_')
+				.toLowerCase()}_results.csv`;
+			document.body.appendChild(link);
+			link.click();
+
+			// Clean up
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(link);
+		} catch (error) {
+			console.error('Error checking submissions:', error);
+			alert('Failed to check submissions. Please try again.');
+		} finally {
+			setChecking(false);
+		}
+	};
 
 	return (
 		<div className='flex h-screen'>
@@ -63,11 +155,20 @@ const Checker = () => {
 								>
 									<span className='font-medium'>{a.title}</span>
 									<div className='flex gap-2'>
-										<button className='bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700'>
+										<button
+											className='bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700'
+											onClick={() => handleDownload(a._id, a.title)}
+										>
 											Download
 										</button>
-										<button className='bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700'>
-											Check
+										<button
+											className={`bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 ${
+												checking ? 'opacity-50 cursor-not-allowed' : ''
+											}`}
+											onClick={() => handleCheck(a._id, a.title)}
+											disabled={checking}
+										>
+											{checking ? 'Checking...' : 'Check'}
 										</button>
 									</div>
 								</li>
@@ -78,6 +179,57 @@ const Checker = () => {
 
 				{tab === 'manual' && (
 					<div className='max-w-xl mx-auto flex flex-col items-center'>
+						<div className='w-full mb-6'>
+							<h3 className='text-lg font-semibold mb-3'>
+								Select Deliverable Type:
+							</h3>
+							<div className='space-y-2'>
+								<label className='flex items-center space-x-2'>
+									<input
+										type='radio'
+										name='deliverable'
+										value='fyp1d2'
+										checked={selectedDeliverable === 'fyp1d2'}
+										onChange={(e) => setSelectedDeliverable(e.target.value)}
+										className='form-radio text-blue-600'
+									/>
+									<span>FYP 1 Deliverable 2</span>
+								</label>
+								<label className='flex items-center space-x-2'>
+									<input
+										type='radio'
+										name='deliverable'
+										value='fyp1d3'
+										checked={selectedDeliverable === 'fyp1d3'}
+										onChange={(e) => setSelectedDeliverable(e.target.value)}
+										className='form-radio text-blue-600'
+									/>
+									<span>FYP 1 Deliverable 3</span>
+								</label>
+								<label className='flex items-center space-x-2'>
+									<input
+										type='radio'
+										name='deliverable'
+										value='fyp2d1'
+										checked={selectedDeliverable === 'fyp2d1'}
+										onChange={(e) => setSelectedDeliverable(e.target.value)}
+										className='form-radio text-blue-600'
+									/>
+									<span>FYP 2 Deliverable 1</span>
+								</label>
+								<label className='flex items-center space-x-2'>
+									<input
+										type='radio'
+										name='deliverable'
+										value='fyp2d2'
+										checked={selectedDeliverable === 'fyp2d2'}
+										onChange={(e) => setSelectedDeliverable(e.target.value)}
+										className='form-radio text-blue-600'
+									/>
+									<span>FYP 2 Deliverable 2</span>
+								</label>
+							</div>
+						</div>
 						<label
 							htmlFor='manual-upload'
 							className='w-full flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg h-64 cursor-pointer bg-white hover:bg-blue-50 transition mb-4'
