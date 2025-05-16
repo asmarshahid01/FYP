@@ -8,6 +8,7 @@ import {
 	getMyAnnouncements,
 	deleteAnnouncement,
 	login,
+	getAllAnnouncements,
 } from '../controllers/coordinatorController.js';
 import authenticate from '../middleware.js';
 import { roundToNearestHours } from 'date-fns';
@@ -22,5 +23,6 @@ router.post('/login', login);
 router.post('/announcements', authenticate, createAnnouncement);
 router.get('/announcements', authenticate, getMyAnnouncements);
 router.delete('/announcements/:id', authenticate, deleteAnnouncement);
+router.get('/all-announcements', authenticate, getAllAnnouncements);
 
 export default router;

@@ -10,8 +10,29 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import coordinatorRoutes from './routes/coordinatorRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
-
+import queryRoutes from './routes/queryRoutes.js';
+import mongoose from 'mongoose';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure upload directories exist
+const uploadDirs = [
+	'./uploads/students',
+	'./uploads/students/deliverables',
+	'./uploads/students/profiles',
+];
+
+uploadDirs.forEach((dir) => {
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, { recursive: true });
+		console.log(`Created directory: ${dir}`);
+	}
+});
 
 await connect();
 
@@ -37,6 +58,7 @@ app.use('/api/notification', notificationRoutes);
 app.use('/api/coordinator', coordinatorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignment', assignmentRoutes);
+app.use('/api/query', queryRoutes);
 
 app.listen(port, () => {
 	console.log('SERVER IS ON!!');

@@ -30,6 +30,7 @@ import CoordinatorQueries from './components/CoordinatorQueries';
 import CoordinatorDeliverables from './components/CoordinatorDeliverables';
 import Queries from './components/Queries';
 import Deliverables from './components/Deliverables';
+import StudentAnnouncements from './components/StudentAnnouncements';
 // function App() {
 // 	return (
 // 		<HomePage></HomePage>
@@ -102,6 +103,10 @@ function App() {
 					<Route
 						path='/deliverables'
 						element={<ProtectedRoute element={<Deliverables />} />}
+					/>
+					<Route
+						path='/student-announcements'
+						element={<ProtectedRoute element={<StudentAnnouncements />} />}
 					/>
 				</Routes>
 				<ToastContainer

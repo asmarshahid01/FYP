@@ -3,6 +3,12 @@ import Submission from '../models/submission.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { PDFValidator } from '../utils/2d2.js';
+import { createObjectCsvWriter } from 'csv-writer';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Create a new assignment
 const createAssignment = async (req, res) => {
@@ -98,20 +104,6 @@ if (!fs.existsSync(deliverableUploadDir)) {
 	fs.mkdirSync(deliverableUploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, deliverableUploadDir);
-	},
-	filename: (req, file, cb) => {
-		// Create a unique filename with timestamp and original extension
-		const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-		cb(
-			null,
-			`${req.user.id}_${uniqueSuffix}${path.extname(file.originalname)}`
-		);
-	},
-});
-
 // Configure multer with file filter
 const fileFilter = (req, file, cb) => {
 	// Accept only specific file types
@@ -138,9 +130,18 @@ const fileFilter = (req, file, cb) => {
 	}
 };
 
-// Create multer instance
+// Create multer instance for initial upload
 const upload = multer({
-	storage: storage,
+	storage: multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, deliverableUploadDir);
+		},
+		filename: (req, file, cb) => {
+			// Create a temporary filename to avoid conflicts
+			const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+			cb(null, `${uniqueSuffix}-${file.originalname}`);
+		},
+	}),
 	fileFilter: fileFilter,
 	limits: {
 		fileSize: 10 * 1024 * 1024, // 10MB limit per file
@@ -149,15 +150,84 @@ const upload = multer({
 });
 
 // Create the middleware function
-export const deliverableUpload = (req, res, next) => {
-	upload.array('files', 5)(req, res, (err) => {
-		if (err instanceof multer.MulterError) {
-			return res.status(400).json({ error: err.message });
-		} else if (err) {
-			return res.status(500).json({ error: err.message });
-		}
-		next();
-	});
+export const deliverableUpload = async (req, res, next) => {
+	try {
+		// First handle the file upload
+		upload.array('files', 5)(req, res, async (err) => {
+			if (err instanceof multer.MulterError) {
+				return res.status(400).json({ error: err.message });
+			} else if (err) {
+				return res.status(500).json({ error: err.message });
+			}
+
+			// After file upload, check assignmentId
+			const { assignmentId } = req.body;
+			if (!assignmentId) {
+				// Clean up uploaded files if assignmentId is missing
+				if (req.files) {
+					req.files.forEach((file) => {
+						const filePath = path.join(deliverableUploadDir, file.filename);
+						if (fs.existsSync(filePath)) {
+							fs.unlinkSync(filePath);
+						}
+					});
+				}
+				return res.status(400).json({ error: 'Assignment ID is required' });
+			}
+
+			// Get assignment title from the database
+			const assignment = await Assignment.findById(assignmentId);
+			if (!assignment) {
+				// Clean up uploaded files if assignment not found
+				if (req.files) {
+					req.files.forEach((file) => {
+						const filePath = path.join(deliverableUploadDir, file.filename);
+						if (fs.existsSync(filePath)) {
+							fs.unlinkSync(filePath);
+						}
+					});
+				}
+				return res.status(404).json({ error: 'Assignment not found' });
+			}
+
+			// Create a safe directory name from the assignment title
+			const safeDirName = assignment.title
+				.replace(/[^a-z0-9]/gi, '_')
+				.toLowerCase();
+			const assignmentDir = path.join(deliverableUploadDir, safeDirName);
+
+			// Create the directory if it doesn't exist
+			if (!fs.existsSync(assignmentDir)) {
+				fs.mkdirSync(assignmentDir, { recursive: true });
+			}
+
+			// Move files to the correct directory
+			for (const file of req.files) {
+				const oldPath = path.join(deliverableUploadDir, file.filename);
+				const newPath = path.join(assignmentDir, file.originalname);
+
+				// Check if file already exists in destination
+				if (fs.existsSync(newPath)) {
+					// Add timestamp to filename to make it unique
+					const timestamp = Date.now();
+					const ext = path.extname(file.originalname);
+					const baseName = path.basename(file.originalname, ext);
+					const newFileName = `${baseName}_${timestamp}${ext}`;
+					const finalPath = path.join(assignmentDir, newFileName);
+					fs.renameSync(oldPath, finalPath);
+					file.filename = newFileName;
+				} else {
+					fs.renameSync(oldPath, newPath);
+					file.filename = file.originalname;
+				}
+			}
+
+			next();
+		});
+	} catch (error) {
+		console.error('Error in deliverableUpload middleware:', error);
+		res.status(500).json({ error: error.message });
+	}
 };
 
 // Get all submissions for the logged-in student
@@ -225,7 +295,33 @@ export const submitDeliverable = async (req, res) => {
 			return res.status(400).json({ error: 'Assignment ID is required' });
 		}
 
+		// Get assignment title for the file path
+		const assignment = await Assignment.findById(assignmentId);
+		if (!assignment) {
+			return res.status(404).json({ error: 'Assignment not found' });
+		}
+
+		const safeDirName = assignment.title
+			.replace(/[^a-z0-9]/gi, '_')
+			.toLowerCase();
+
 		// Remove previous submissions for this assignment/student
+		const oldSubmissions = await Submission.find({
+			assignment: assignmentId,
+			student: studentId,
+		});
+
+		// Delete old files from filesystem
+		for (const submission of oldSubmissions) {
+			if (submission.fileUrl) {
+				const filePath = path.join(process.cwd(), submission.fileUrl);
+				if (fs.existsSync(filePath)) {
+					fs.unlinkSync(filePath);
+				}
+			}
+		}
+
+		// Delete old submissions from database
 		await Submission.deleteMany({
 			assignment: assignmentId,
 			student: studentId,
@@ -237,7 +333,7 @@ export const submitDeliverable = async (req, res) => {
 				const submission = new Submission({
 					assignment: assignmentId,
 					student: studentId,
-					fileUrl: `/uploads/students/deliverables/${file.filename}`,
+					fileUrl: `/uploads/students/deliverables/${safeDirName}/${file.filename}`,
 					submittedAt: new Date(),
 				});
 				return submission.save();
@@ -305,6 +401,215 @@ export const unsubmitDeliverable = async (req, res) => {
 			error: 'Failed to unsubmit deliverable',
 			details: error.message,
 		});
+	}
+};
+
+// Download all submissions for an assignment
+export const downloadSubmissions = async (req, res) => {
+	try {
+		const { assignmentId } = req.params;
+
+		// Get assignment details
+		const assignment = await Assignment.findById(assignmentId);
+		if (!assignment) {
+			return res.status(404).json({ error: 'Assignment not found' });
+		}
+
+		// Create a safe directory name from the assignment title
+		const safeDirName = assignment.title
+			.replace(/[^a-z0-9]/gi, '_')
+			.toLowerCase();
+		const assignmentDir = path.join(
+			process.cwd(),
+			'uploads',
+			'students',
+			'deliverables',
+			safeDirName
+		);
+
+		// Check if directory exists
+		if (!fs.existsSync(assignmentDir)) {
+			return res
+				.status(404)
+				.json({ error: 'No submissions found for this assignment' });
+		}
+
+		// Create a zip file containing all submissions
+		const archiver = (await import('archiver')).default;
+		const archive = archiver('zip', {
+			zlib: { level: 9 }, // Maximum compression
+		});
+
+		// Set the response headers
+		res.setHeader('Content-Type', 'application/zip');
+		res.setHeader(
+			'Content-Disposition',
+			`attachment; filename=${safeDirName}_submissions.zip`
+		);
+
+		// Pipe the archive to the response
+		archive.pipe(res);
+
+		// Add all files from the assignment directory to the zip
+		archive.directory(assignmentDir, false);
+
+		// Finalize the archive
+		await archive.finalize();
+	} catch (error) {
+		console.error('Error in downloadSubmissions:', error);
+		res.status(500).json({
+			error: 'Failed to download submissions',
+			details: error.message,
+		});
+	}
+};
+
+// Check submissions using 2d2.js validator
+export const checkSubmissions = async (req, res) => {
+	try {
+		const { assignmentId } = req.params;
+		const { checkerKey } = req.body;
+		const assignment = await Assignment.findById(assignmentId);
+
+		if (!assignment) {
+			return res.status(404).json({ error: 'Assignment not found' });
+		}
+
+		// Map checkerKey to module path and type
+		const checkerMap = {
+			'1d2': { path: '../utils/1d2.js', type: 'pdf' },
+			'1d3': { path: '../utils/1d3.js', type: 'pdf' },
+			'2d1': { path: '../utils/2d1.js', type: 'image' },
+			'2d2': { path: '../utils/2d2.js', type: 'pdf' },
+		};
+
+		if (!checkerMap[checkerKey]) {
+			return res.status(400).json({ error: 'Invalid checker key' });
+		}
+
+		const checkerInfo = checkerMap[checkerKey];
+
+		// Get all submissions for this assignment
+		const submissions = await Submission.find({
+			assignment: assignmentId,
+		}).populate('student', 'name rollNumber');
+
+		// Create a temporary directory for processing
+		const tempDir = path.join(__dirname, '..', 'temp');
+		if (!fs.existsSync(tempDir)) {
+			fs.mkdirSync(tempDir, { recursive: true });
+		}
+
+		// Create CSV writer
+		const csvWriter = createObjectCsvWriter({
+			path: path.join(tempDir, 'results.csv'),
+			header: [
+				{ id: 'id', title: 'ID' },
+				{ id: 'status', title: 'Status' },
+				{ id: 'comments', title: 'Comments' },
+			],
+		});
+
+		const results = [];
+
+		for (const submission of submissions) {
+			const filename = path.basename(
+				submission.fileUrl,
+				path.extname(submission.fileUrl)
+			);
+
+			if (!submission.fileUrl) {
+				results.push({
+					id: filename,
+					status: 'Unsatisfactory',
+					comments: 'No file found in submission.',
+				});
+				continue;
+			}
+
+			const filePath = path.join(process.cwd(), submission.fileUrl);
+
+			if (!fs.existsSync(filePath)) {
+				results.push({
+					id: filename,
+					status: 'Unsatisfactory',
+					comments: `File not found at path: ${filePath}`,
+				});
+				continue;
+			}
+
+			try {
+				if (checkerInfo.type === 'pdf') {
+					// Dynamically import the correct PDFValidator
+					const { PDFValidator } = await import(checkerInfo.path);
+					const validator = new PDFValidator();
+					await validator.loadPDF(filePath);
+					await validator.validateDocumentStructure();
+					await validator.validateContentQuality();
+					await validator.validateReferences();
+					if (validator.validateSignatures) {
+						await validator.validateSignatures(filePath);
+					}
+					const result = validator.getFinalResult();
+					results.push({
+						id: filename,
+						status: result.status,
+						comments: result.comments.join('; '),
+					});
+				} else if (checkerInfo.type === 'image') {
+					// For 2d1, use checkImageAndText
+					const checker = require(checkerInfo.path);
+					// You may need to adjust the template/target image paths as per your requirements
+					const templateImagePath = 'template.png';
+					const targetImagePath = filePath;
+					const result = await checker.checkImageAndText(
+						templateImagePath,
+						targetImagePath
+					);
+					let status = 'Satisfactory';
+					let comments = [];
+					if (!result.imageFound) {
+						status = 'Unsatisfactory';
+						comments.push('Required image not found in submission.');
+					}
+					if (!result.textFound) {
+						status = 'Unsatisfactory';
+						comments.push('Required text not found in image.');
+					}
+					results.push({
+						id: filename,
+						status,
+						comments: comments.join('; ') || 'All checks passed.',
+					});
+				}
+			} catch (error) {
+				results.push({
+					id: filename,
+					status: 'Error',
+					comments: `Error processing file (${submission.fileUrl}): ${error.message}`,
+				});
+			}
+		}
+
+		await csvWriter.writeRecords(results);
+
+		res.download(
+			path.join(tempDir, 'results.csv'),
+			`${assignment.title
+				.replace(/[^a-z0-9]/gi, '_')
+				.toLowerCase()}_results.csv`,
+			(err) => {
+				if (err) {
+					console.error('Error sending file:', err);
+				}
+				fs.unlinkSync(path.join(tempDir, 'results.csv'));
+			}
+		);
+	} catch (error) {
+		console.error('Error checking submissions:', error);
+		res
+			.status(500)
+			.json({ error: 'Failed to check submissions', details: error.message });
 	}
 };
 
